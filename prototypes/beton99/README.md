@@ -41,3 +41,17 @@ _To be filled after playtests._
   civilians raise their hands when aimed at, ragdoll-ish death pose, hip sway.
 - Day/night cycle (1 game minute = 1 s): sky, fog, sun, window lights, lamps and bloom follow the clock.
 - City life: pigeons that scatter, steam from manholes, flickering shop signs, 20 hidden cassettes to collect.
+
+## v5 — redo: real models, mobile layout
+- Characters are now the CC0 rigged "PS2 Styled Characters" from OpenGameArt (male and female base, converted
+  FBX → glTF JSON). Clothes, skin, hair and prints are painted into the 128×256 atlas at runtime; hats, hood, mask,
+  chain and weapons attach to bone sockets. Animation is procedural on the skeleton: walk/run cycle with hip and
+  spine counter-twist, idle breathing and look-around, two-hand aim, punch/kick/bat, phone/smoke/lean poses,
+  bike riding, death.
+- Cars are the CC0 "PSX Style Cars" by GGBot (OBJ → glTF JSON) with their colour variants, police and taxi skins;
+  dents deform the model mesh. Normals are computed on load (the OBJs ship without them).
+- Road and asphalt textures from [ambientCG](https://ambientcg.com) (CC0).
+- Mobile: internal resolution is set from the short side of the screen (fixes the "melting" bottom in portrait);
+  a compact layout for landscape phones moves the bag/pause buttons to the top and shrinks the HUD.
+- Fixed: camera NaN when mounting a BMX/scooter (grey screen), hood facing sideways, hats sitting on the face,
+  stubble pixels showing white on dark skin, the decimated pistol model rendering as noise.
