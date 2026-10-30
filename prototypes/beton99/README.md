@@ -30,3 +30,14 @@ _To be filled after playtests._
   blinds light, posters and a ceiling fan, gang members carrying boomboxes, long sleeves under tees, printed jorts,
   hi-top and skate shoes.
 - Run locally through a web server (assets load with fetch): `python3 -m http.server` in this folder.
+
+## v4 — vehicles, animation, time of day
+- Cars: separate wheels (front ones steer), opening driver door with walk-up/carjack/exit animations, dents that deform the
+  body mesh, suspension bounce on curbs and hits, brake lights, headlight beams at night, exhaust, parked-car alarms.
+  New types: taxi, sports coupe, city bus, scooter (plus BMX). Per-type acceleration, grip and mass.
+- Radio stations in cars (BÉTON FM, RAP 93, PÉRIPH TECHNO, off) — `R` or the weapon button switches; on foot you hear the city.
+- Traffic lights at every intersection on a shared cycle; AI traffic stops on red.
+- Characters: punch–punch–kick combo, idle poses (phone, smoking with smoke puffs, arms crossed, looking around),
+  civilians raise their hands when aimed at, ragdoll-ish death pose, hip sway.
+- Day/night cycle (1 game minute = 1 s): sky, fog, sun, window lights, lamps and bloom follow the clock.
+- City life: pigeons that scatter, steam from manholes, flickering shop signs, 20 hidden cassettes to collect.
