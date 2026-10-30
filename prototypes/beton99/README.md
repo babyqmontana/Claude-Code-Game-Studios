@@ -55,3 +55,29 @@ _To be filled after playtests._
   a compact layout for landscape phones moves the bag/pause buttons to the top and shrinks the HUD.
 - Fixed: camera NaN when mounting a BMX/scooter (grey screen), hood facing sideways, hats sitting on the face,
   stubble pixels showing white on dark skin, the decimated pistol model rendering as noise.
+
+## v6 — a city to live in
+Code for the new systems lives in `src/v6/*.js` and is inlined into `index.html` by `python3 tools/build.py`
+(edit the module, then rebuild; the core in `index.html` exposes hooks through the `V6` object).
+- **Paris banlieue look:** zinc mansard roofs with dormers and chimney pots, cornices, wrought-iron balconies, striped
+  awnings on Centre-ville shops; loggias with painted parapets, satellite dishes and laundry on the HLM towers;
+  wheat-pasted posters and tags at street level; bollards, benches, bins, bike racks, plane trees in grates, Morris
+  columns, newspaper kiosks, bus shelters and drinks machines along every street.
+- **Street life:** crews at tower entrances with a boombox (you hear it as you approach), people on benches, kids
+  playing football on the courts with a ball you can kick. Sit on a bench, buy a drink, do pull-ups or dance with
+  the crew — each activity has its own animation and camera.
+- **Interiors:** every shop is a room you walk into (kebab, bakery, tabac, pharmacy, DIY, surplus, garage). Talk to
+  the shopkeeper at the counter; clothes are tried on at the mirror in FRINGUES STREET with an orbiting camera,
+  live preview and prices, GTA-style.
+- **Guns:** over-the-shoulder aim (right mouse or while firing), recoil kick, muzzle light, ejected casings, bullet
+  holes, blood spray and pools, hit markers, flinches, slow-motion kill cam, echoing shots, phone vibration.
+- **Story:** a cutscene system (letterbox, named subtitles, shot/reverse-shot, skip) and two missions —
+  «Посылка» (deliver Momo's bag, then a shoot-out) and «Стены говорят» (tag three walls for Nadia, meet her in the park).
+- **Skate and BMX tricks (THPS-style):** ollie/bunny hop, flips, grabs, spins, grinds on every curb, bench, ledge
+  and rail, manuals with a balance meter, combos with a multiplier, bails. A skatepark with quarter pipes (vert air),
+  a funbox, kickers, ledges and rails. After mission 2 you carry your own board (B / ДОСКА button).
+- **Cars:** skid marks, tyre smoke, sparks and a camera kick on impacts, engine sound with gear changes.
+- **Menu and style:** the title screen flies over the city at dusk with a news ticker; new options for hair (short,
+  afro, braids, bald), stubble, glasses and a crossbody bag (street peds use them too).
+- Fixed: 270k bollard instances from a nested loop, aircon spam (1M triangles), hats on the face, crossed-arms pose,
+  cutscene timing tied to frame rate, messages covering the middle of the screen.
