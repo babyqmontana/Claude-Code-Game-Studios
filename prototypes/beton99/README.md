@@ -4,7 +4,7 @@
 
 **How to run:** open `index.html` in any modern browser (desktop or mobile). Three.js r128 loads from cdnjs; everything else (textures, music, SFX) is generated at runtime.
 
-**Status:** in-progress
+**Status:** in-progress (v2: lofted PS2-style character models, Russian UI, bug fixes)
 
 ## What's in it
 - 6×6-block city in four districts (Cité des Tilleuls, Centre-ville, Les Pavillons, Quartier Gare): HLM towers and barres, shop rows, houses, parks, parking lots, perimeter wall, skyline.
