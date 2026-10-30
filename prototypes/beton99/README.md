@@ -112,3 +112,13 @@ Code for the new systems lives in `src/v6/*.js` and is inlined into `index.html`
 - **French voices:** cutscene and shop lines are spoken in French through the browser's speech synthesis (different
   pitch per character, Russian subtitles stay), plus street barks — greetings from crews, threats when a fight
   starts, police shouts, yelps when hit. Uses whatever French voice the device has; silent if there is none.
+
+## v9 — a round city
+- The bending field (`src/v6/05_warp.js`) now has six swirls around crossroads on top of the long waves. A swirl
+  rotates points by an angle that fades with distance from its centre, so it can never fold the city over itself;
+  streets near a centre turn into arcs around a round plaza, and blocks between swirls become wedges and ovals.
+- Round plazas (`src/v6/07_round.js`) sit on the swirl centres: a cobbled island with a flower bed, a kerb and a
+  dashed give-way ring.
+- Long flat geometry (roads, pavements, walls, balconies) is cut into ~3 m triangles at load so it bends smoothly.
+- The minimap and the big map are resampled through the same field (exact inverse of the swirls, fixed-point
+  inverse of the waves), and the map rotation and player arrow use the on-screen heading.
