@@ -122,3 +122,11 @@ Code for the new systems lives in `src/v6/*.js` and is inlined into `index.html`
 - Long flat geometry (roads, pavements, walls, balconies) is cut into ~3 m triangles at load so it bends smoothly.
 - The minimap and the big map are resampled through the same field (exact inverse of the swirls, fixed-point
   inverse of the waves), and the map rotation and player arrow use the on-screen heading.
+
+## v9.1 — fixes
+- Models vanishing while playing: frustum culling tested objects at their grid position, not where the bend draws
+  them, so peds, cars and props popped out near curves. Culling now moves each bounding sphere through the bend
+  (`src/v6/12_mapfix.js`).
+- The map is drawn as vector curves in the bent space (1024 px) instead of resampling a pixel image.
+- A real loading screen (progress bar, tips) stays up until the city is built; the menu never shows the fallback
+  boxy character, and the menu flyover is bent like the game.

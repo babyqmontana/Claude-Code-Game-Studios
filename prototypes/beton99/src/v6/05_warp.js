@@ -35,9 +35,3 @@ function tessellate(geo,maxLen){if(!geo.isBufferGeometry)return geo;let g=geo.in
       push([a,'m',c],mid);push(['m',b,c],mid);}
     const ng=new THREE.BufferGeometry();for(const k of attrs){const A=g.attributes[k];ng.setAttribute(k,new THREE.Float32BufferAttribute(out[k],A.itemSize));}g=ng;}
   g.computeBoundingSphere();return g;}
-/* maps follow the bent city */
-function warpMapImage(src){const S=512,MWv=MW,k=S/MWv,[c,g]=mk(S,S),sd=src.getContext('2d').getImageData(0,0,S,S).data,od=g.createImageData(S,S),o=od.data;
-  for(let y=0;y<S;y++)for(let x=0;x<S;x++){const wx=x/k-MARG,wz=y/k-MARG,L=unwarpRaw(wx,wz),sx=Math.round((L[0]+MARG)*k),sy=Math.round((L[1]+MARG)*k),i=(y*S+x)*4;
-    if(sx<0||sy<0||sx>=S||sy>=S){o[i]=20;o[i+1]=17;o[i+2]=42;o[i+3]=255;continue;}const j=(sy*S+sx)*4;o[i]=sd[j];o[i+1]=sd[j+1];o[i+2]=sd[j+2];o[i+3]=255;}
-  g.putImageData(od,0,0);return c;}
-{const bm=buildMapImage;buildMapImage=function(){bm();mapImg=warpMapImage(mapImg);};}

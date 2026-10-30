@@ -25,7 +25,7 @@ const FLY={cam:new THREE.PerspectiveCamera(55,1,0.5,1400),t:rr(0,100)};
 V6.menuBg=function(rdt){if(!worldBuilt||state!=='menu')return false;FLY.t+=rdt;const t=FLY.t*0.035,R=SIZE*0.42,cx=SIZE/2,cz=SIZE/2;
   FLY.cam.aspect=innerWidth/innerHeight;FLY.cam.updateProjectionMatrix();FLY.cam.position.set(cx+Math.cos(t)*R,50+Math.sin(t*1.7)*6,cz+Math.sin(t)*R);FLY.cam.lookAt(cx+Math.cos(t+0.9)*R*0.35,6,cz+Math.sin(t+0.9)*R*0.35);
   if(!FLY.tod){FLY.tod=1;gameMin=20*60+30;updDayNight(true);}updFlicker();updTrafficLights();
-  mscene.background=null;renderer.render(scene,FLY.cam);return true;};
+  mscene.background=null;WARPU.value=1;FLY.cam.position.copy(warpV(FLY.cam.position.clone()));FLY.cam.lookAt(warpV(new V3(cx+Math.cos(t+0.9)*R*0.35,6,cz+Math.sin(t+0.9)*R*0.35)));renderer.render(scene,FLY.cam);WARPU.value=0;return true;};
 {const tt=toTitle;toTitle=function(){tt();FLY.tod=0;};}
 V6CSS.textContent+=`#ticker{position:fixed;left:0;right:0;bottom:calc(max(10px,2.5vmin) + env(safe-area-inset-bottom,0px) + 2px);height:22px;overflow:hidden;z-index:30;pointer-events:none;display:none;background:linear-gradient(90deg,transparent,rgba(8,10,40,.75) 10%,rgba(8,10,40,.75) 90%,transparent)}
 #ticker span{position:absolute;white-space:nowrap;font:600 12px/22px 'Exo 2',sans-serif;color:#cfd6ff;letter-spacing:.06em;animation:tick 60s linear infinite}#ticker b{color:#ffd84d;margin:0 12px}
