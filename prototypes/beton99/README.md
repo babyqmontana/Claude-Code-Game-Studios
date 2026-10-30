@@ -17,3 +17,16 @@
 
 ## Findings
 _To be filled after playtests._
+
+## v3 — CC0 assets and PS2 look
+- `tools/fetch_assets.py` downloads CC0 textures and models from [Poly Haven](https://polyhaven.com) (license: CC0),
+  shrinks textures to 256 px and decimates models to 250–2500 triangles. Output lives in `assets/`.
+  Textures: asphalt, concrete pavers, plaster/panel facades, brick, metal shutters, denim, cotton jersey, grass, wood floor,
+  roof tiles, bedspread. Models: boombox, CRT TV, ceiling fan, baseball bat, pistol, aircon units, fire escapes,
+  trash bags, boxes, tyres, crates, utility boxes, road barriers, cassette player, console, pillows, rats.
+- Default style is now "PS2": bilinear filtering, no vertex jitter, bloom, pink-violet fog, light cones under lamps,
+  overhead cables. The PS1 look is one option away.
+- New: BMX bikes (lean, hop, spinning wheels), car drift and body roll, the player's flat (save point) with a CRT TV,
+  blinds light, posters and a ceiling fan, gang members carrying boomboxes, long sleeves under tees, printed jorts,
+  hi-top and skate shoes.
+- Run locally through a web server (assets load with fetch): `python3 -m http.server` in this folder.
