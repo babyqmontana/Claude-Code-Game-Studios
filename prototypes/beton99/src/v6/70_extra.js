@@ -19,7 +19,7 @@ function braidTex(col){const k='b'+col;if(STY[k])return STY[k];return STY[k]=rte
   if(app.bag){const G=new THREE.Group();ch.chest.add(G);const bm=LM({color:0x161616}),st=LM({color:0x2a2a2a});const b=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.12,0.05),bm);b.position.set(0.1,-0.12,0.13);b.rotation.z=0.15;G.add(b);
     const lg=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.02,0.002),LM({color:0xd8d8d8}));lg.position.set(0.1,-0.11,0.156);lg.rotation.z=0.15;G.add(lg);
     const strap=new THREE.Mesh(new THREE.BoxGeometry(0.03,0.62,0.012),st);strap.position.set(0.0,0.06,0.12);strap.rotation.z=-0.62;G.add(strap);const s2=strap.clone();s2.position.z=-0.11;G.add(s2);}
-  return ch;};}
+  sharpen(ch.root);return ch;};}
 /* main menu: slow flyover of the city at dusk behind the character */
 const FLY={cam:new THREE.PerspectiveCamera(55,1,0.5,1400),t:rr(0,100)};
 V6.menuBg=function(rdt){if(!worldBuilt||state!=='menu')return false;FLY.t+=rdt;const t=FLY.t*0.035,R=SIZE*0.42,cx=SIZE/2,cz=SIZE/2;

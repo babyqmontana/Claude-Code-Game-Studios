@@ -46,7 +46,7 @@ V6.cam=function(){const rd=RDT||0.016,c=pl.inCar;updSlow(rd);
     const P0=typeof s.from==='function'?s.from():s.from,P1=s.to?(typeof s.to==='function'?s.to():s.to):P0,L0=typeof s.look==='function'?s.look():s.look,L1=s.look2?(typeof s.look2==='function'?s.look2():s.look2):L0;
     px=lerp(P0[0],P1[0],k);py=lerp(P0[1],P1[1],k);pz=lerp(P0[2],P1[2],k);lx=lerp(L0[0],L1[0],k);ly=lerp(L0[1],L1[1],k);lz=lerp(L0[2],L1[2],k);fov=s.fov||fov;
     if(s.t>=s.dur&&!s.hold){const done=s.done;CAMS.shot=null;CAMS.init=false;if(done)done();}
-    CAMS.pos.set(px,py,pz);CAMS.look.set(lx,ly,lz);cam.position.copy(CAMS.pos);cam.lookAt(CAMS.look);setFov(fov,rd,true);return true;}
+    CAMS.pos.set(px,py,pz);CAMS.look.set(lx,ly,lz);if(s.shake){CAMS.pos.x+=Math.sin(time*7.3)*s.shake;CAMS.pos.y+=Math.sin(time*5.1)*s.shake*0.6;}cam.position.copy(warpV(CAMS.pos.clone()));cam.lookAt(warpV(CAMS.look.clone()));setFov(fov,rd,true);return true;}
   const aimOn=!c&&!pl.dead&&pl.ch&&pl.ch.aim>0.35&&!WDEF[pl.cur].melee&&!WDEF[pl.cur].spray;
   CAMS.aimK=lerp(CAMS.aimK,aimOn?1:0,Math.min(1,rd*9));const ak=CAMS.aimK;
   let tx,ty,tz,dist,side=0;
@@ -64,7 +64,7 @@ V6.cam=function(){const rd=RDT||0.016,c=pl.inCar;updSlow(rd);
   const follow=c?1-Math.exp(-rd*14):1-Math.exp(-rd*30);CAMS.pos.x=lerp(CAMS.pos.x,cx,follow);CAMS.pos.y=lerp(CAMS.pos.y,cy,follow);CAMS.pos.z=lerp(CAMS.pos.z,cz,follow);
   cam.position.copy(CAMS.pos);
   if(shake>0.001){cam.position.x+=rr(-1,1)*shake*0.3;cam.position.y+=rr(-1,1)*shake*0.3;cam.position.z+=rr(-1,1)*shake*0.3;shake*=Math.pow(0.02,rd);}
-  const lk=c?0.4:0.15+0.05*ak;cam.lookAt(tx+Math.sin(yw)*ak*6,ty+lk-Math.sin(CAMS.kick)*2,tz+Math.cos(yw)*ak*6);
+  warpV(cam.position);const lk=c?0.4:0.15+0.05*ak;cam.lookAt(warpV(new V3(tx+Math.sin(yw)*(ak*6+0.01),ty+lk-Math.sin(CAMS.kick)*2,tz+Math.cos(yw)*(ak*6+0.01))));
   CAMS.kick*=Math.pow(0.0005,rd);CAMS.kickX*=Math.pow(0.001,rd);CAMS.fovP*=Math.pow(0.002,rd);
   setFov(fov-CAMS.fovP,rd);
   $('#xh').style.opacity=ak>0.6?1:0;

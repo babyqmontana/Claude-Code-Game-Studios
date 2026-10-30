@@ -25,6 +25,8 @@ function skateparkBuild(){const S=STORY.spots||{},taken=S.drop;const pk=blocks.f
   for(let i=cars.length-1;i>=0;i--){const c=cars[i];if(c.x>x0-2&&c.x<x1+2&&c.z>z0-2&&c.z<z1+2)removeCar(i);}
   const conc=LM({map:imgTex(ASSETS.img.dirtyconc_g||ASSETS.img.asphalt,1,1),color:0xb8b4ac}),wood=LM({map:imgTex(ASSETS.img.wood,1,1),color:0xb08860}),metal=LM({color:0x9aa0a8,emissive:0x111111});
   const F=SKP.feat,R=SKP.rails;
+  {const sl=new THREE.Mesh(new THREE.PlaneGeometry(x1-x0+3,z1-z0+3).rotateX(-Math.PI/2),LM({map:imgTex(ASSETS.img.dirtyconc_g||ASSETS.img.asphalt,(x1-x0)/4,(z1-z0)/4),color:0xb4b0a8,polygonOffset:true,polygonOffsetFactor:-1}));sl.position.set(cx,0.21,cz);scene.add(sl);
+   for(let k=0;k<6;k++){const j=new THREE.Mesh(new THREE.PlaneGeometry(x1-x0+3,0.05).rotateX(-Math.PI/2),LM({color:0x5a5650}));j.position.set(cx,0.215,z0-1.5+k*(z1-z0+3)/5);scene.add(j);}}
   // feature types: kicker (linear rise), qp (quarter pipe, curved, vert), box (flat top)
   const wedge=(x,z,w,l,h,dir,mat,curve)=>{const g=new THREE.BufferGeometry(),N=curve?12:1,P_=[],U=[];const pt=t=>[t*l,curve?h*(1-Math.sqrt(Math.max(0,1-t*t))):h*t];
     for(let i=0;i<N;i++){const a=pt(i/N),b=pt((i+1)/N);P_.push(-w/2,a[1],a[0], w/2,a[1],a[0], w/2,b[1],b[0], -w/2,a[1],a[0], w/2,b[1],b[0], -w/2,b[1],b[0]);

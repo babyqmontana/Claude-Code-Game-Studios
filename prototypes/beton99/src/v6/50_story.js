@@ -4,7 +4,7 @@ const CUT={steps:null,i:0,t:0,onEnd:null};
 function cutscene(steps,onEnd){CINE.on=true;document.body.classList.add('cine');$('#lbox').classList.add('on');$('#skip').classList.add('on');if(locked)document.exitPointerLock();
   pl.aimT=0;mouseFire=false;CUT.steps=steps;CUT.i=-1;CUT.onEnd=onEnd;cutNext();}
 function cutNext(){CUT.i++;CUT.t=0;CUT.t0=performance.now();const s=CUT.steps[CUT.i];if(!s){cutEnd();return;}
-  if(s.do)s.do();if(s.cam)camShot(Object.assign({hold:true,dur:s.dur||3},s.cam));
+  if(s.do)s.do();if(s.acts)for(const a of s.acts)runAct(a);if(s.card)showCard(s.card,s.dur||3);if(s.cam)camShot(Object.assign({hold:true,dur:s.dur||3},typeof s.cam==='function'?s.cam():s.cam));
   if(s.say){say(s.say[0],s.say[1]);if(s.say[2]&&s.say[2].ch)s.say[2].ch.talk=s.dur||3;}else $('#sub').classList.remove('on');}
 function cutEnd(){const f=CUT.onEnd;CUT.steps=null;CINE.on=false;document.body.classList.remove('cine');$('#lbox').classList.remove('on');$('#skip').classList.remove('on');$('#sub').classList.remove('on');
   CAMS.shot=null;CAMS.init=false;yaw=pl.h;pitch=0.25;if(f)f();}
@@ -17,7 +17,8 @@ V6.upd.push(()=>{if(!CUT.steps)return;const s=CUT.steps[CUT.i];CUT.t=(performanc
 function actor(app,x,z,h){const p=spawnPed('actor',x,z,'x',z,1);scene.remove(p.ch.root);disposeChar(p.ch);p.ch=makeChar(Object.assign({},DEFAULT_APP,app));scene.add(p.ch.root);
   p.x=x;p.z=z;p.h=p.th=h;p.state='actor';p.hp=400;setWeapon(p.ch,null);return p;}
 function dropActor(p){const i=peds.indexOf(p);if(i>=0)removePed(i);}
-const _vped=V6.ped;V6.ped=function(p,dt,d){if(p.state==='actor'){if(p.look){p.th=Math.atan2(p.look.x-p.x,p.look.z-p.z);}return 0;}return _vped(p,dt,d);};
+const _vped=V6.ped;V6.ped=function(p,dt,d){if(p.state==='actor'){const g=p.goto;if(g){const dx=g.x-p.x,dz=g.z-p.z,L=Math.hypot(dx,dz);if(L>0.12){const sp=Math.min(g.spd||1.5,L*3);p.x+=dx/L*sp*dt;p.z+=dz/L*sp*dt;p.th=Math.atan2(dx,dz);return sp;}p.goto=null;}
+  if(p.look){p.th=Math.atan2(p.look.x-p.x,p.look.z-p.z);}return 0;}return _vped(p,dt,d);};
 const at=(o,dx,dy,dz)=>[o.x+(dx||0),(o.y||0)+(dy||0),o.z+(dz||0)];
 /* shot helpers: over-the-shoulder from a onto b, two-shot from the side */
 function ots(a,b,side,dist){const dx=b.x-a.x,dz=b.z-a.z,L=Math.hypot(dx,dz)||1,ux=dx/L,uz=dz/L,rx=uz,rz=-ux;side=side||1;dist=dist||1.4;

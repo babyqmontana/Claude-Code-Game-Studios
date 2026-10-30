@@ -1,6 +1,6 @@
 """Download CC0 assets from Poly Haven, shrink them for a PS2-era look, write to ../assets.
 
-Textures: 1k diffuse -> 256px JPEG (fabrics also get a grayscale copy for tinting).
+Textures: 1k diffuse -> 512px (surfaces you walk past) or 256px JPEG (fabrics also get a grayscale copy for tinting).
 Models: 1k glTF -> decimated GLB with a 256px base-colour texture.
 """
 import io, json, os, sys, tempfile, urllib.request
@@ -13,16 +13,16 @@ os.makedirs(os.path.join(OUT, 'tex'), exist_ok=True)
 os.makedirs(os.path.join(OUT, 'models'), exist_ok=True)
 
 TEXTURES = {  # id -> (output name, size, grayscale copy)
-    'asphalt_02': ('asphalt', 256, False), 'concrete_pavers': ('pavers', 256, False),
-    'grey_plaster_02': ('plaster', 256, True), 'beige_wall_001': ('beige', 256, True),
-    'damaged_plaster': ('damaged', 256, True), 'concrete_tile_facade': ('panels', 256, True),
-    'brick_wall_02': ('brick', 256, False), 'painted_metal_shutter': ('shutter', 256, True),
-    'dirty_concrete': ('dirtyconc', 256, True), 'concrete_block_wall': ('blockwall', 256, False),
+    'asphalt_02': ('asphalt', 512, False), 'concrete_pavers': ('pavers', 512, False),
+    'grey_plaster_02': ('plaster', 512, True), 'beige_wall_001': ('beige', 512, True),
+    'damaged_plaster': ('damaged', 512, True), 'concrete_tile_facade': ('panels', 512, True),
+    'brick_wall_02': ('brick', 512, False), 'painted_metal_shutter': ('shutter', 256, True),
+    'dirty_concrete': ('dirtyconc', 512, True), 'concrete_block_wall': ('blockwall', 512, False),
     'denim_fabric': ('denim', 128, True), 'cotton_jersey': ('jersey', 128, True),
-    'sparse_grass': ('grass', 256, False), 'old_wooden_floor_01': ('floor', 256, False),
+    'sparse_grass': ('grass', 512, False), 'old_wooden_floor_01': ('floor', 256, False),
     'dark_wooden_planks': ('wood', 256, False), 'corrugated_iron': ('corrug', 256, True),
     'clay_roof_tiles': ('roof', 256, False), 'quatrefoil_jacquard_fabric': ('bedspread', 256, False),
-    'rusty_metal': ('rust', 256, False), 'beige_wall_002': ('wall2', 256, True),
+    'rusty_metal': ('rust', 256, False), 'beige_wall_002': ('wall2', 512, True),
 }
 MODELS = {  # id -> (output name, target triangles)
     'boombox': ('boombox', 1200), 'Television_01': ('tv', 1500), 'ceiling_fan': ('fan', 1400),

@@ -146,7 +146,7 @@ function roomGarage(R){const{box,plane,W,D,H,scene:S}=R;const metal=LM({map:imgT
   const oil=rtex(64,64,(g)=>{g.fillStyle='rgba(0,0,0,.6)';g.beginPath();g.ellipse(32,32,28,18,0.3,0,TAU);g.fill();});plane(2.4,1.6,new THREE.MeshBasicMaterial({map:oil,transparent:true,depthWrite:false}),-W/2+2.4,0.01,0.5,0,-Math.PI/2);}
 
 /* entering / leaving */
-function roomFor(s){return ROOMS.cache[s.id]||(ROOMS.cache[s.id]=buildRoom(s.id));}
+function roomFor(s){if(!ROOMS.cache[s.id]){const R=buildRoom(s.id);sharpen(R.scene);detailScene(R.scene,1.3,0.4,o=>o.material.map&&!o.material.map.wrapS);ROOMS.cache[s.id]=R;}return ROOMS.cache[s.id];}
 function enterRoom(s){if(ROOMS.busy)return;ROOMS.busy=true;fadeTo(1,250);sfx.door();
   setTimeout(()=>{const R=roomFor(s);ROOMS.cur=R;R.out=outsidePoint(s);state='room';UI.ret='room';if(pl.ch.root.parent)pl.ch.root.parent.remove(pl.ch.root);R.scene.add(pl.ch.root);
     pl.x=R.door.x;pl.z=R.door.z-0.2;pl.y=0;pl.h=pl.th=Math.PI;ROOMS.mode='walk';ROOMS.camInit=false;setWeapon(pl.ch,null);

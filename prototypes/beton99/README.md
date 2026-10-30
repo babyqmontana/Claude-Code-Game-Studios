@@ -81,3 +81,20 @@ Code for the new systems lives in `src/v6/*.js` and is inlined into `index.html`
   afro, braids, bald), stubble, glasses and a crossbody bag (street peds use them too).
 - Fixed: 270k bollard instances from a nested loop, aircon spam (1M triangles), hats on the face, crossed-arms pose,
   cutscene timing tied to frame rate, messages covering the middle of the screen.
+
+## v7 — story, painting, a smooth city
+- **The city is no longer a grid on screen.** `src/v6/05_warp.js` bends every vertex (and the camera) through one
+  smooth field at render time, so streets flow in long curves and blocks lose their right angles; AI, traffic,
+  collisions and the minimap still work on the underlying grid.
+- **Sharper look:** 720p internal resolution by default, mipmaps and anisotropic filtering on every texture,
+  facades drawn at 10 px/m, ground and wall textures refetched at 512 px, and a world-space concrete/grain detail
+  layer on walls, props and street furniture so neighbouring objects share one material. Bloom now only catches real
+  lights instead of smearing bright paint.
+- **Graffiti painting:** with a spray can, fire at a wall to open a canvas on that wall: spray (soft, overspray,
+  drips) or marker, 12 colours, three nozzle sizes, an optional stencil of letters to trace. The finished piece is
+  sprayed onto the wall with a short camera move; respect pays by coverage and colours.
+- **Story:** an intro (title card, crane and orbit shots over the city, voice-over, tracking shot of the hero) and four
+  chapters — «Посылка», «Стены говорят», «Ночной поезд» (paint the wall by the tracks, escape the police) and the
+  finale «Хищники» (take the rivals' lot, beat Стервятник). Cutscenes use orbit, crane, dolly, tracking and
+  shoulder shots, chapter cards and film grain; actors walk, turn, point, shrug, dap, laugh and shake spray cans
+  while they talk.
