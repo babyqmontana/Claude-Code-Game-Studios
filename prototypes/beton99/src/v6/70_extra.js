@@ -23,7 +23,7 @@ function braidTex(col){const k='b'+col;if(STY[k])return STY[k];return STY[k]=rte
 /* main menu: slow flyover of the city at dusk behind the character */
 const FLY={cam:new THREE.PerspectiveCamera(55,1,0.5,1400),t:rr(0,100)};
 V6.menuBg=function(rdt){if(!worldBuilt||state!=='menu')return false;FLY.t+=rdt;const t=FLY.t*0.035,R=SIZE*0.42,cx=SIZE/2,cz=SIZE/2;
-  FLY.cam.aspect=innerWidth/innerHeight;FLY.cam.updateProjectionMatrix();FLY.cam.position.set(cx+Math.cos(t)*R,26+Math.sin(t*1.7)*6,cz+Math.sin(t)*R);FLY.cam.lookAt(cx+Math.cos(t+0.9)*R*0.35,6,cz+Math.sin(t+0.9)*R*0.35);
+  FLY.cam.aspect=innerWidth/innerHeight;FLY.cam.updateProjectionMatrix();FLY.cam.position.set(cx+Math.cos(t)*R,50+Math.sin(t*1.7)*6,cz+Math.sin(t)*R);FLY.cam.lookAt(cx+Math.cos(t+0.9)*R*0.35,6,cz+Math.sin(t+0.9)*R*0.35);
   if(!FLY.tod){FLY.tod=1;gameMin=20*60+30;updDayNight(true);}updFlicker();updTrafficLights();
   mscene.background=null;renderer.render(scene,FLY.cam);return true;};
 {const tt=toTitle;toTitle=function(){tt();FLY.tod=0;};}

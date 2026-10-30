@@ -451,7 +451,8 @@ function loadAssets(){
   const mdlP=L?MDLN.map(n=>new Promise(res=>{try{L.load('assets/models/'+n+'.json',g=>{try{ASSETS.mdl[n]=prepModel(g.scene);}catch(e){}res();},undefined,()=>res());}catch(e){res();}})):[];
   const ps2P=L?new Promise(res=>{L.load('assets/chars/ps2char.json',g=>{try{setupPS2(g);}catch(e){console.error(e);PS2.gltf=null;}res();},undefined,()=>res());}):Promise.resolve();
   const carP=L?loadCarModels(L):[];
-  return Promise.race([Promise.all(imgP.concat(mdlP,[ps2P],carP)),new Promise(r=>setTimeout(r,25000))]);}
+  const all=imgP.concat(mdlP,[ps2P],carP);let done=0;const tick=()=>{done++;const e=$('#sysmsg');if(e&&!worldBuilt)e.textContent='ЧТЕНИЕ ДИСКА… '+Math.round(done/all.length*100)+'%';};all.forEach(p=>p.then(tick));
+  return Promise.race([Promise.all(all),new Promise(r=>setTimeout(r,180000))]);}
 function setupPS2(g){g.scene.traverse(o=>{if(!o.isSkinnedMesh)return;const m=o.material;if(m.map){m.map.encoding=THREE.LinearEncoding;}
     if(m.name==='Masc_Mat')PS2.img.m=m.map.image;else if(m.name==='Femme_Mat')PS2.img.f=m.map.image;
     else if(m.name==='Eyes')PS2.eyeMat=LM({map:m.map,skinning:true});else if(m.name==='Hair')PS2.hairMat=LM({map:m.map,skinning:true,alphaTest:0.45,side:THREE.DoubleSide});});
@@ -912,7 +913,7 @@ function makeCharPS2(app,matOverride,noShadow){
   const root=new THREE.Group();root.rotation.order='YXZ';const inner=THREE.SkeletonUtils.clone(PS2.gltf.scene);root.add(inner);
   const fem=app.sex==='f',mat=matOverride||charAtlasPS2(app);let hairM=null;
   inner.traverse(o=>{if(!o.isSkinnedMesh)return;o.frustumCulled=false;const isF=o.name.startsWith('Femme');if(isF!==fem){o.visible=false;return;}
-    const n=o.material.name;if(n==='Eyes'){o.material=matOverride||PS2.eyeMat;}else if(n==='Hair'){if(!hairM&&!matOverride){hairM=PS2.hairMat.clone();hairM.color.set(app.hairCol).multiplyScalar(1.6);}o.material=matOverride||hairM;if(app.hat==='hood'||app.hat==='bonnet')o.visible=false;}else o.material=mat;});
+    const n=o.material.name;if(n==='Eyes'){o.material=matOverride||PS2.eyeMat.clone();if(!matOverride)o.userData.eye=1;}else if(n==='Hair'){if(!hairM&&!matOverride){hairM=PS2.hairMat.clone();hairM.color.set(app.hairCol).multiplyScalar(1.6);}o.material=matOverride||hairM;if(app.hat==='hood'||app.hat==='bonnet')o.visible=false;}else o.material=mat;});
   const rig=rigSetup(inner);
   const hand=boneSocket(rig,root,'HandR',new V3(0,0,0));const hs=new THREE.Group();hs.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(new V3(0,-1,0),new V3(1,0,0),new V3(0,0,1)));hs.position.set(-0.06,-0.02,0.02);hand.add(hs);
   const head=boneSocket(rig,root,'Head',new V3(0,0.07,0.012));const chest=boneSocket(rig,root,'Spine2');
@@ -1327,7 +1328,7 @@ const pl={x:HOSP.x,y:0.15,z:HOSP.z,vy:0,h:Math.PI,hp:100,armor:0,money:150,onGro
   items:{kebab:1,canette:0,croissant:0},cur:'fists',cd:0,ch:null,app:Object.assign({},DEFAULT_APP),name:'ИГРОК ОДИН',stats:{kills:0,tags:0,missions:0,time:0},spd:0,aimT:0,hurtT:0};
 pl.tapes=[];
 const V6={carHit:null,menuBg:null,blips:()=>[],music:null,ped:null,anim:null,upd:[],interact:[],fire:[],hurt:[],kill:[],build:[],player:null,cam:null,input:null,act:{}};let TS=1;
-let state='boot',yaw=Math.PI,pitch=0.32,lookIdle=0,shake=0,crime=0,lastCrime=-99,wanted=0,mission=null,curZone='',gameMin=21*60+47,worldBuilt=false;
+let state='boot',yaw=Math.PI,pitch=0.32,lookIdle=0,shake=0,crime=0,lastCrime=-99,wanted=0,mission=null,curZone='',gameMin=18*60+35,worldBuilt=false;
 const peds=[],tags=[];
 
 function setPlayerChar(){if(pl.ch){if(pl.ch.root.parent)pl.ch.root.parent.remove(pl.ch.root);disposeChar(pl.ch);}pl.ch=makeChar(pl.app);scene.add(pl.ch.root);setWeapon(pl.ch,pl.cur==='fists'?null:pl.cur);pl.ch.root.visible=!pl.inCar;}
@@ -1441,7 +1442,7 @@ function readInput(){
   const I={mx,mz,run,fire,jump,action,wpn,inv,horn,hold,aim:!!(rDrag||tbtn.aim)};if(V6.input)V6.input(I,P_);return I;}
 
 /* ======================= COMBAT ======================= */
-function hurtPlayer(d,src){if(pl.dead)return;if(pl.inCar){pl.inCar.hp-=d*0.8;d*=0.25;}
+function hurtPlayer(d,src){if(pl.dead)return;d*=0.5;pl.lastHurt=time;if(pl.inCar){pl.inCar.hp-=d*0.8;d*=0.25;}
   if(pl.armor>0){const a=Math.min(pl.armor,d*0.75);pl.armor-=a;d-=a;}pl.hp-=d;pl.hurtT=0.3;$('#dmg').style.opacity=0.6;if(d>2)sfx.hurt();shake=Math.max(shake,0.15);
   if(pl.hp<=0)die();}
 function addCrime(v){crime=Math.min(30,crime+v);lastCrime=time;const th=[1,3,6,10,16];let w=0;for(const t of th)if(crime>=t)w++;if(w>wanted){wanted=w;banner('РОЗЫСК','УРОВЕНЬ '+w,1.6);}else wanted=w;}
@@ -1530,8 +1531,8 @@ function pedAttack(p,dt){const tx=pl.inCar?pl.inCar.x:pl.x,tz=pl.inCar?pl.inCar.
   if(pl.dead||d>90||(p.type==='cop'&&wanted===0)){p.ch.aim=0;computeReturn(p);return 0;}
   const gun=p.armed==='pistol';p.atk-=dt;
   if(gun&&d<20){p.th=Math.atan2(dx,dz);p.ch.aim=Math.min(1,p.ch.aim+dt*4);
-    if(p.atk<=0){p.atk=rr(0.9,1.5);p.ch.root.updateMatrixWorld(true);const mz=muzzle(p.ch,0.22).clone();flash(mz,0.6,0.06);
-      const vol=clamp(1-d/60,0.15,1);sfx.pistol(vol);const hit=Math.random()<(0.32+(d<8?0.2:0))*(pl.inCar?1.2:1);
+    if(p.atk<=0){p.atk=rr(1.4,2.3);p.ch.root.updateMatrixWorld(true);const mz=muzzle(p.ch,0.22).clone();flash(mz,0.6,0.06);
+      const vol=clamp(1-d/60,0.15,1);sfx.pistol(vol);const hit=Math.random()<(0.2+(d<8?0.12:0))*(1-d/40)*(pl.inCar?0.8:1);
       tracer(mz,TMPV2.set(tx+(hit?0:rr(-1.5,1.5)),1.2,tz+(hit?0:rr(-1.5,1.5))));if(hit)hurtPlayer(p.type==='cop'?7:6);}
     if(d<6){moveFree(p,-dx,-dz,1.5,dt);return 1.5;}return 0;}
   p.ch.aim=0;if(d>1.3){moveFree(p,dx,dz,4.6,dt);return 4.6;}
@@ -1562,7 +1563,7 @@ function updatePeds(dt){
   // spawning
   const civ=peds.filter(p=>p.type!=='cop').length;
   if(civ<30&&Math.random()<dt*6){const s=sidewalkSpot(30,72);if(s){const gangZ=zoneName(s.x,s.z)==='CITÉ DES TILLEULS'?0.3:0.1;spawnPed(Math.random()<gangZ?'gang':'civ',s.x,s.z,s.ax,s.L,Math.random()<0.5?1:-1);}}
-  const cops=peds.filter(p=>p.type==='cop'&&p.state!=='dead').length,wantCops=[0,2,3,5,6,8][wanted];
+  const cops=peds.filter(p=>p.type==='cop'&&p.state!=='dead').length,wantCops=[0,1,2,3,4,5][wanted];
   if(cops<wantCops&&Math.random()<dt*1.2){const s=sidewalkSpot(30,55);if(s){const c=spawnPed('cop',s.x,s.z,s.ax,s.L,1);c.state='attack';}}}
 
 /* ======================= CARS UPDATE ======================= */
@@ -1646,11 +1647,11 @@ function updateCars(dt){const ox=pl.inCar?pl.inCar.x:pl.x,oz=pl.inCar?pl.inCar.z
     for(const p of peds){if(p.state==='dead'||p.state==='knock')continue;const[lx,lz]=carLocal(c,p.x,p.z);if(Math.abs(lx)<c.T.w/2+0.3&&Math.abs(lz)<c.T.l/2+0.3){
       const sp=Math.abs(c.speed)*(c.T.bike?0.35:1);p.hp-=sp*3.2;p.state='knock';p.lastHitPlayer=c===pl.inCar;p.vx=Math.sin(c.h)*c.speed*0.7+rr(-1,1);p.vz=Math.cos(c.h)*c.speed*0.7+rr(-1,1);p.vy=2+sp*0.25;
       emit(p.x,1,p.z,10,'#8a0a10',2,3,0.8,12);sfx.thud(0.7);if(c===pl.inCar){addCrime(p.type==='cop'?2:1);c.speed*=0.85;}}}
-    if(!pl.inCar&&!pl.dead&&c.mode!=='parked'&&!(pl.carHitT>time)){const[lx,lz]=carLocal(c,pl.x,pl.z);if(Math.abs(lx)<c.T.w/2+0.3&&Math.abs(lz)<c.T.l/2+0.3){pl.carHitT=time+0.8;hurtPlayer(Math.abs(c.speed)*(c.T.bike?0.5:2.2));pl.vy=4;pl.onGround=false;
+    if(!pl.inCar&&!pl.dead&&c.mode!=='parked'&&!(pl.carHitT>time)){const[lx,lz]=carLocal(c,pl.x,pl.z);if(Math.abs(lx)<c.T.w/2+0.3&&Math.abs(lz)<c.T.l/2+0.3){pl.carHitT=time+0.8;hurtPlayer(Math.abs(c.speed)*(c.T.bike?0.4:1.4));pl.vy=4;pl.onGround=false;
       const s=Math.sign(lx||1);pl.x+=-Math.cos(c.h)*s*1.2;pl.z+=Math.sin(c.h)*s*1.2;}}}
   // spawning traffic & police
   const traffic=cars.filter(c=>c.mode==='traffic').length;if(traffic<15&&Math.random()<dt*3)spawnTraffic(false);
-  const pc=cars.filter(c=>c.mode==='chase').length,wantPC=[0,1,1,2,3,4][wanted];if(pc<wantPC&&Math.random()<dt*0.6)spawnTraffic(true);}
+  const pc=cars.filter(c=>c.mode==='chase').length,wantPC=[0,0,1,1,2,3][wanted];if(pc<wantPC&&Math.random()<dt*0.6)spawnTraffic(true);}
 
 /* ======================= TRAFFIC LIGHTS ======================= */
 // one 22 s cycle for the whole city: X-axis traffic green, then Z-axis
@@ -1766,7 +1767,7 @@ function updatePlayer(dt,inp){
   const aiming=!w.melee&&!w.spray&&(inp.fire||pl.aimT>0);if(aiming&&pl.aimT<=0)pl.th=yaw;
   pl.h=angLerp(pl.h,pl.th===undefined?pl.h:pl.th,Math.min(1,dt*12));
   if(inp.jump&&pl.onGround){pl.vy=6.2;pl.onGround=false;}
-  pl.vy-=18*dt;pl.y+=pl.vy*dt;const g=groundY(pl.x,pl.z);if(pl.y<=g+0.001){if(!pl.onGround&&pl.vy<-9)hurtPlayer(-pl.vy);pl.y=g;pl.vy=0;pl.onGround=true;}else if(pl.y-g<0.2&&pl.vy<=0&&pl.onGround){pl.y=g;}
+  pl.vy-=18*dt;pl.y+=pl.vy*dt;const g=groundY(pl.x,pl.z);if(pl.y<=g+0.001){if(!pl.onGround&&pl.vy<-11)hurtPlayer((-pl.vy-11)*4);pl.y=g;pl.vy=0;pl.onGround=true;}else if(pl.y-g<0.2&&pl.vy<=0&&pl.onGround){pl.y=g;}
   pushOut(pl,0.35,pl.y+0.3);for(const c of cars)if(Math.abs(c.x-pl.x)<4&&Math.abs(c.z-pl.z)<4)carPush(c,pl,0.35);
   pl.x=clamp(pl.x,-12,SIZE+12);pl.z=clamp(pl.z,-12,SIZE+12);
   pl.cd-=dt;if(inp.fire&&pl.cd<=0)playerFire(inp);
@@ -2028,7 +2029,7 @@ function frame(t){requestAnimationFrame(frame);const rdt=Math.min(0.05,(t-lastT)
     AU.amb.gain.setTargetAtTime(state==='play'&&!radio?0.06:0,AU.c.currentTime,0.4);if(state==='menu')AU.station=0;}
   if(state==='play'){const inp=readInput();pl.stats.time+=dt;gameMin+=dt;
     updatePlayer(dt,inp);for(const f of V6.upd)f(dt,inp);updateCars(dt);updatePeds(dt);updRats(dt);updBirds(dt);updSteam(dt);updTapes(dt);updTrafficLights();updDayNight();updFlicker();
-    if(time-lastCrime>14&&wanted>0){const near=peds.some(p=>p.type==='cop'&&p.state==='attack'&&Math.hypot(p.x-pl.x,p.z-pl.z)<25);if(!near){crime=Math.max(0,crime-dt*0.6);const th=[1,3,6,10,16];let w=0;for(const x of th)if(crime>=x)w++;if(w<wanted){wanted=w;if(!w)banner('ТЫ СКИНУЛ ХВОСТ','',2);}}}
+    if(time-lastCrime>9&&wanted>0){const near=peds.some(p=>p.type==='cop'&&p.state==='attack'&&Math.hypot(p.x-pl.x,p.z-pl.z)<16);if(!near){crime=Math.max(0,crime-dt*1.1);const th=[1,3,6,10,16];let w=0;for(const x of th)if(crime>=x)w++;if(w<wanted){wanted=w;if(!w)banner('ТЫ СКИНУЛ ХВОСТ','',2);}}}
     else if(wanted===0&&crime>0&&time-lastCrime>6)crime=Math.max(0,crime-dt*0.5);
     if(mission&&mission.t<=0){banner('МИССИЯ ПРОВАЛЕНА','Слишком медленно.',2.2);scene.remove(beam);mission=null;}
     const it=nearestInteract();const lbl=it?(isTouch?it.label:'E — '+it.label):'';if(lbl!==lastPrompt){hud.prompt.textContent=lbl;lastPrompt=lbl;document.querySelector('.tb[data-b=action]').classList.toggle('hl',!!it);}
@@ -2909,7 +2910,7 @@ function playIntro(){const H=HOSP,P0={x:pl.x,z:pl.z};wanted=0;const vo=(l,d)=>({
     {dur:2.6,cam:trackShot(pl,[-0.6,1.6,-2.4],[0,1.6,0],42),acts:[['gest',pl,'look',2.4]],do:()=>{$('#sub').classList.remove('vo');}}],
     ()=>{pl.cineGo=null;$('#sub').classList.remove('vo');showMsg('Момо ждёт тебя у подъезда — жёлтая метка «M» на карте.',5);});}
 /* new games start with the intro instead of the old hint */
-{const sp=startPlay;startPlay=function(l){sp(l);if(!l&&!(pl.story&&pl.story.intro)){pl.story=pl.story||{};pl.story.intro=1;setTimeout(()=>{if(state==='play')playIntro();},600);}};}
+{const sp=startPlay;startPlay=function(l){sp(l);if(!l){gameMin=18*60+35;updDayNight(true);}if(!l&&!(pl.story&&pl.story.intro)){pl.story=pl.story||{};pl.story.intro=1;setTimeout(()=>{if(state==='play')playIntro();},600);}};}
 /* richer staging for chapters 1–2: replace their openings with moving actors */
 const _m1=startM1;startM1=function(){_m1();const momo=STORY.actors[0];if(!momo||!CUT.steps)return;const mp={x:momo.x,z:momo.z},P_={x:pl.x,z:pl.z};
   pl.z+=3.5;momo.x-=2.5;momo.ch.pose=null;
@@ -2939,7 +2940,7 @@ STORY.onPiece=(t,cov)=>{if(STORY.cur!=='m3'||STORY.stage!=='go')return;if(Math.h
   if(cov<0.12){setTimeout(()=>showMsg('Слишком мало краски. Надя просила КУСОК — нарисуй больше.',3),1500);return;}
   STORY.stage='escape';clearTarget();PNT.after=()=>{const w=STORY.spots.wall3;cutscene([
     {dur:3.2,cam:craneShot({x:w.x,z:w.z},5,-Math.PI/2,1.4,7,3.2,52)},
-    {dur:2.6,cam:{from:[w.x-12,1.2,w.z+16],to:[w.x-10,1.4,w.z+12],look:[w.x-4,1,w.z],fov:44},say:['','*сирены*'],do:()=>{addCrime(10);}}],
+    {dur:2.6,cam:{from:[w.x-12,1.2,w.z+16],to:[w.x-10,1.4,w.z+12],look:[w.x-4,1,w.z],fov:44},say:['','*сирены*'],do:()=>{addCrime(3.2);}}],
     ()=>{objective('<em>Уходи от полиции</em> и вернись домой');setTarget(HOME.x,HOME.z);});};};
 function m3Tick(){if(pl.dead){missionFailed('Тебя взяли. Кусок закрасят к утру.');return;}
   if(STORY.stage==='escape'&&Math.hypot(HOME.x-pl.x,HOME.z-pl.z)<4){if(wanted>0){if(!STORY.data.w){STORY.data.w=1;objective('Сначала <em>сбрось хвост</em>');}return;}if(!pl.inCar)m3Outro();}}
@@ -3191,7 +3192,7 @@ function braidTex(col){const k='b'+col;if(STY[k])return STY[k];return STY[k]=rte
 /* main menu: slow flyover of the city at dusk behind the character */
 const FLY={cam:new THREE.PerspectiveCamera(55,1,0.5,1400),t:rr(0,100)};
 V6.menuBg=function(rdt){if(!worldBuilt||state!=='menu')return false;FLY.t+=rdt;const t=FLY.t*0.035,R=SIZE*0.42,cx=SIZE/2,cz=SIZE/2;
-  FLY.cam.aspect=innerWidth/innerHeight;FLY.cam.updateProjectionMatrix();FLY.cam.position.set(cx+Math.cos(t)*R,26+Math.sin(t*1.7)*6,cz+Math.sin(t)*R);FLY.cam.lookAt(cx+Math.cos(t+0.9)*R*0.35,6,cz+Math.sin(t+0.9)*R*0.35);
+  FLY.cam.aspect=innerWidth/innerHeight;FLY.cam.updateProjectionMatrix();FLY.cam.position.set(cx+Math.cos(t)*R,50+Math.sin(t*1.7)*6,cz+Math.sin(t)*R);FLY.cam.lookAt(cx+Math.cos(t+0.9)*R*0.35,6,cz+Math.sin(t+0.9)*R*0.35);
   if(!FLY.tod){FLY.tod=1;gameMin=20*60+30;updDayNight(true);}updFlicker();updTrafficLights();
   mscene.background=null;renderer.render(scene,FLY.cam);return true;};
 {const tt=toTitle;toTitle=function(){tt();FLY.tod=0;};}
@@ -3285,7 +3286,7 @@ function paintEnd(apply){$('#paint').classList.remove('on');document.body.classL
   setTimeout(()=>{pop('+'+pay+' € РЕСПЕКТА','#7dff9a');banner(cov>0.35?'ШЕДЕВР!':cov>0.15?'КУСОК!':'ТЕГ!',PNT.colors.size+' цв. · '+Math.round(cov*100)+'% стены',2);},1300);
   if(typeof m2Tagged==='function'&&STORY.cur==='m2'&&STORY.stage==='tag')setTimeout(()=>m2Tagged(t),1400);
   if(STORY.onPiece)STORY.onPiece(t,cov);
-  addCrime(near?0.2:0.6);if(pl.spray<=0)setTimeout(()=>{equip('fists');showMsg('БАЛЛОНЧИКИ КОНЧИЛИСЬ',1.5);},1600);}
+  if(peds.some(p=>p.type==='cop'&&Math.hypot(p.x-pl.x,p.z-pl.z)<30))addCrime(0.8);if(pl.spray<=0)setTimeout(()=>{equip('fists');showMsg('БАЛЛОНЧИКИ КОНЧИЛИСЬ',1.5);},1600);}
 V6.upd.push(dt=>{const a=PNT.anim;if(!a)return;a.t+=dt;a.mat.opacity=Math.min(1,a.t/1.3);pl.ch.aim=1;
   if(Math.random()<dt*20){const w=PNT.wall;emit(w.x+w.nx*0.3+rr(-1.2,1.2)*w.nz,rr(1,2.3),w.z+w.nz*0.3-rr(-1.2,1.2)*w.nx,1,PNT.col,0.4,0.4,0.6,0);}
   if(Math.random()<dt*6)nz(0.3,4200,'highpass',0.12);
@@ -3293,6 +3294,90 @@ V6.upd.push(dt=>{const a=PNT.anim;if(!a)return;a.t+=dt;a.mat.opacity=Math.min(1,
 /* spray weapon now paints instead of stamping a random tag */
 doTag=function(){paintStart();};
 addEventListener('keydown',e=>{if(PNT.on&&e.code==='Escape'){e.stopImmediatePropagation();paintEnd(false);}},true);
+/* --- 90_alive.js --- */
+/* ======================= V6 ALIVE: blinking, idle fidgets, gentle health regen, French street voices ======================= */
+/* --- blinking: each character gets a skin-coloured eyelid texture swapped in for a few frames --- */
+{const mk1=makeChar;makeChar=function(app,m,n){const ch=mk1(app,m,n);if(!ch.ps2||m)return ch;const a=Object.assign({},DEFAULT_APP,app);
+  const[c,g]=mk(2,2);const col=new THREE.Color(a.skin).multiplyScalar(0.82);g.fillStyle=col.getStyle();g.fillRect(0,0,2,2);ch.lid=new THREE.CanvasTexture(c);ch.eyes=[];
+  ch.inner.traverse(o=>{if(o.userData&&o.userData.eye)ch.eyes.push(o.material);});ch.blinkT=rr(1,4);return ch;};}
+function blink(ch,dt){if(!ch.eyes||!ch.eyes.length)return;ch.blinkT-=dt;
+  if(ch.blinkT<=0&&!ch.blinking){ch.blinking=0.11;ch.eyeMap=ch.eyeMap||ch.eyes[0].map;for(const m of ch.eyes)m.map=ch.lid;}
+  if(ch.blinking){ch.blinking-=dt;if(ch.blinking<=0){ch.blinking=0;for(const m of ch.eyes)m.map=ch.eyeMap;ch.blinkT=Math.random()<0.15?0.18:rr(2,5.5);}}
+  if(ch.dead&&ch.eyes[0].map!==ch.lid){for(const m of ch.eyes)m.map=ch.lid;ch.blinkT=1e9;}}
+/* --- idle life: weight shifts, breathing, small fidgets; walking gets more swagger --- */
+const _va3=V6.anim;V6.anim=function(ch,dt,spd,o){_va3(ch,dt,spd,o);blink(ch,dt);if(o&&(o.bike||o.skate))return;
+  const t=time+ch.phase*1.7;
+  if(spd<0.2&&!ch.pose&&ch.aim<0.1&&!ch.dead&&!ch.gest){const w=Math.sin(t*0.55);
+    addP('Hips',0,0.05*w,0.035*w);addP('Spine1',0.02*Math.sin(t*1.9),0,-0.03*w);addP('UpperLegL',-0.04*Math.max(0,w),0,0);addP('LowerLegL',0.12*Math.max(0,w),0,0);addP('UpperLegR',-0.04*Math.max(0,-w),0,0);addP('LowerLegR',0.12*Math.max(0,-w),0,0);
+    addP('UpperArmL',0,0,0.03*Math.sin(t*1.9));addP('UpperArmR',0,0,-0.03*Math.sin(t*1.9));
+    ch.fidT=(ch.fidT??rr(3,9))-dt;if(ch.fidT<=0){ch.fidT=rr(5,12);ch.gest={k:pick(['scratch','look','shrugl','tug','neck']),t:0,d:rr(1.2,2)};}}
+  if(spd>0.6&&!o?.two&&ch.aim<0.1){const s=Math.sin(ch.phase);addP('Spine2',0,0.06*s,0.03*Math.cos(ch.phase));addP('Head',0.03*Math.abs(s),-0.05*s,0);}
+  const G=ch.gest;if(G){const k=Math.sin(Math.min(1,G.t/G.d)*Math.PI);
+    if(G.k==='scratch'){addP('UpperArmR',-0.6*k,0.4*k,-1.1*k);addP('ForeArmR',0,2.0*k,0);addP('Head',0.12*k,0,0.1*k);}
+    else if(G.k==='shrugl'){addP('UpperArmL',0,0,0.18*k);addP('UpperArmR',0,0,-0.18*k);addP('Head',0,0,0.12*k);}
+    else if(G.k==='tug'){addP('UpperArmL',-0.35*k,0,0.25*k);addP('ForeArmL',0,-1.3*k,0);addP('UpperArmR',-0.35*k,0,-0.25*k);addP('ForeArmR',0,1.3*k,0);}
+    else if(G.k==='neck'){addP('Head',0,0.25*Math.sin(G.t*6)*k,0.2*k);addP('Neck',0,0,0.15*k);}}};
+/* --- the player slowly heals back to 50 when out of trouble --- */
+V6.upd.push(dt=>{if(!pl.dead&&pl.hp<50&&time-(pl.lastHurt||-99)>6&&wanted<2)pl.hp=Math.min(50,pl.hp+dt*2.5);});
+/* --- French voices through the browser's speech synthesis (Russian subtitles stay on screen) --- */
+const VOX={fr:null,ok:'speechSynthesis' in window,last:0};
+function voxVoices(){if(!VOX.ok)return;const v=speechSynthesis.getVoices().filter(x=>/^fr/i.test(x.lang));VOX.fr=v.length?v:null;}
+if(VOX.ok){voxVoices();speechSynthesis.onvoiceschanged=voxVoices;}
+const VOICE={'МОМО':[0.8,1.06,0],'ДЖАМЕЛЬ':[0.9,1.0,1],'НАДЯ':[1.25,1.05,2],'СТЕРВЯТНИК':[0.55,0.9,3],'ПРОДАВЕЦ':[1.0,1.1,1],'':[0.85,0.95,0]};
+function speak(fr,who,vol){if(!VOX.ok||!VOX.fr||!fr||SET.sfx<=0)return;try{const u=new SpeechSynthesisUtterance(fr);const p=VOICE[who]||[0.95,1.05,0];
+    const pool=VOX.fr,fem=who==='НАДЯ',pickV=pool.find(v=>fem?/female|femme|amelie|aurelie|audrey|marie|julie|celine|hortense|virginie/i.test(v.name):/male|homme|thomas|daniel|nicolas|paul|henri|claude|antoine/i.test(v.name));
+    u.voice=pickV||pool[p[2]%pool.length];u.lang=u.voice.lang;u.pitch=p[0];u.rate=p[1];u.volume=clamp((vol??1)*SET.sfx/10,0,1);speechSynthesis.cancel();speechSynthesis.speak(u);VOX.last=time;}catch(e){}}
+const FR={
+ 'Йо, малой! Наконец-то. Я тебя полчаса жду.':"Yo, p'tit! Enfin. Ça fait une demi-heure que j't'attends.",
+ 'Видишь сумку? Её надо отвезти Джамелю, на стоянку у вокзала. Быстро и тихо.':"Tu vois le sac? Tu l'amènes à Djamel, au parking de la gare. Vite fait, discret.",
+ 'Возьми мою тачку. Одна царапина — и платишь ты.':"Prends ma caisse. Une rayure, et c'est toi qui paies.",
+ 'И не гони, слышишь? Хвоста нам не надо.':"Et roule tranquille, hein? On veut pas d'embrouilles.",
+ 'Ты от Момо? Давай сюда, не светись.':"C'est Momo qui t'envoie? Donne, et fais pas l'malin.",
+ 'Так... всё на месте. Момо не обманывает.':"Bon... tout est là. Momo, il est réglo.",
+ 'Чёрт! «Хищники»! Они за тобой ехали!':"Putain! Les Rapaces! Ils t'ont suivi!",
+ 'Держи ствол. Разберись с ними — мы прикроем сумку.':"Tiens. Occupe-toi d'eux, on garde le sac.",
+ 'Красиво сработал. Момо в тебе не ошибся.':"Propre. Momo s'est pas trompé sur toi.",
+ 'Вот твоя доля. Заходи в гараж — для тебя всегда найдётся работа.':"Voilà ta part. Passe au garage, y'a toujours du taf pour toi.",
+ 'Это ты разрулил с «Хищниками»? Неплохо для новенького.':"C'est toi qui as géré les Rapaces? Pas mal, pour un nouveau.",
+ 'Эти клоуны закрашивают наши куски по всему району. Пора напомнить, чей это город.':"Ces clowns repassent nos pièces partout. Faut leur rappeler à qui est la ville.",
+ 'Три стены у вокзала. Держи баллоны. Копы взбесятся — не попадайся.':"Trois murs vers la gare. Prends les bombes. Les keufs vont rager, fais gaffe.",
+ 'Как закончишь — жду у фонтана в парке.':"Quand t'as fini, je t'attends à la fontaine du parc.",
+ 'Видела твою работу. Весь вокзал теперь говорит нашими буквами.':"J'ai vu ton travail. Toute la gare parle avec nos lettres maintenant.",
+ 'Дальше? Держи мою доску. Говорят, ты катаешь не хуже, чем рисуешь.':"La suite? Prends ma planche. Il paraît que tu rides aussi bien que tu peins.",
+ 'Скейтпарк на старой стоянке — метка S на карте. Покажи им, кто хозяин района.':"Le skatepark, sur le vieux parking. Montre-leur qui tient le quartier.",
+ 'Эй! Смотрите, кто вернулся! Живой!':"Eh! Regardez qui revient! Vivant!",
+ 'Видел вокзал? «Хищники» закрасили всё. Даже наш кусок у путей.':"T'as vu la gare? Les Rapaces ont tout repassé. Même notre pièce près des voies.",
+ 'Нужен не тег. Нужен кусок, который увидит каждый поезд утром.':"Pas un tag. Une pièce que chaque train verra demain matin.",
+ 'Нарисуй сам. Как чувствуешь. Только быстро — там патрули.':"Peins-la toi-même. Comme tu le sens. Mais vite, y'a des patrouilles.",
+ 'Утренний поезд ехал медленно. Весь вагон смотрел на твою стену.':"Le train du matin roulait doucement. Tout le wagon regardait ton mur.",
+ 'Но «Хищники» это тоже видели. Будь осторожен. Они пойдут на Момо.':"Mais les Rapaces l'ont vu aussi. Fais attention. Ils vont s'en prendre à Momo.",
+ 'Они пришли ночью. Забрали гараж. Джамель у них.':"Ils sont venus cette nuit. Ils ont pris le garage. Ils ont Djamel.",
+ 'Старая стоянка на севере. Их главный — Стервятник. Без него они никто.':"Le vieux parking au nord. Leur chef, c'est le Vautour. Sans lui, ils sont rien.",
+ 'Возьми это. И вернись живым, малой.':"Prends ça. Et reviens vivant, p'tit.",
+ 'Смотрите-ка. Художник приехал.':"Tiens, tiens. L'artiste est arrivé.",
+ 'Здесь твои стены и закончатся. Валите его!':"C'est ici que tes murs s'arrêtent. Allez, butez-le!",
+ 'Я знал, что ты придёшь. Момо сказал — ты псих.':"J'savais que tu viendrais. Momo m'a dit que t'étais un ouf.",
+ 'Стервятника больше нет. Район снова наш. Твои стены — тоже.':"Le Vautour, c'est fini. Le quartier est à nous. Tes murs aussi.",
+ 'Я был тут, Момо. Что за пожар?':"J'étais là, Momo. C'est quoi l'urgence?",'Понял. Без проблем.':"Compris. Pas de souci.",'Слухи быстро ходят.':"Les nouvelles vont vite.",
+ 'И что дальше?':"Et maintenant?",'Ещё увидимся.':"On se revoit.",'Стена у путей. Ночью. Понял.':"Le mur des voies. Cette nuit. Compris.",'Пусть идут.':"Qu'ils viennent.",
+ 'Где они?':"Ils sont où?",'Это не мой район. Это наш.':"C'est pas mon quartier. C'est le nôtre.",
+ 'Сюда не возят туристов. Отсюда Эйфелева башня — просто огни на горизонте.':"Ici, pas de touristes. D'ici, la tour Eiffel, c'est juste des lumières à l'horizon.",
+ 'Бетон, стены в цвет, крыши из цинка. Каждая стена здесь кому-то принадлежит.':"Du béton, des murs en couleurs, des toits en zinc. Ici, chaque mur appartient à quelqu'un.",
+ 'Меня не было полгода. Больница Сен-Рок. Долгая история.':"Six mois d'absence. L'hôpital Saint-Roch. Longue histoire.",
+ 'Но район не ждёт. Момо уже ищет меня — у него всегда есть работа.':"Mais le quartier n'attend pas. Momo me cherche déjà. Lui, il a toujours du boulot.",
+ 'Йо! Новая поставка кроссов, глянь.':"Yo! Nouvel arrivage de baskets, regarde.",'Бери что нравится. Всё оригинал, отвечаю.':"Prends c'que tu veux. Que de l'original, j'te jure.",
+ 'Сидит как влитое.':"Ça te va nickel.",'Огонь, брат. На районе все обзавидуются.':"Le feu, frère. Tout le quartier va être jaloux.",'Вот это стиль.':"Ça, c'est du style."};
+{const sy=say;say=function(who,line,dur){sy(who,line,dur);const isPl=who===pl.name,fr=FR[line];if(fr)speak(fr,isPl?'PL':who.trim()===''&&$('#sub').classList.contains('vo')?'':who);};}
+/* street barks: greetings near crews, threats when a fight starts, cops shouting */
+const BARK={greet:["Wesh!","Ça dit quoi?","Bien ou bien?","Salam, frère.","Vas-y, tranquille."],gang:["Tu cherches quoi, toi?","Viens là!","C'est notre quartier!","Tu vas voir!"],
+  cop:["Police! Plus un geste!","Arrêtez-vous!","Les mains en l'air!"],flee:["Au secours!","T'es malade!","Arrête!"],hit:["Aïe!","Ouais, vas-y!","Laisse-moi!"]};
+V6.upd.push(()=>{if(CINE.on||time-VOX.last<3.5)return;for(const p of peds){if(p.state==='dead')continue;const d=Math.hypot(p.x-pl.x,p.z-pl.z);if(d>16)continue;
+  let k=null;if(p.state==='attack'&&!p.bk){p.bk=1;k=p.type==='cop'?'cop':'gang';}else if(p.state==='flee'&&!p.bk){p.bk=1;k='flee';}
+  else if(p.hang&&p.state==='idle'&&d<4&&!p.bkg&&!pl.inCar){p.bkg=1;k='greet';p.ch.gest={k:'wave',t:0,d:1.4};}
+  if(k){speak(pick(BARK[k]),p.type==='cop'?'СТЕРВЯТНИК':'МОМО',clamp(1-d/18,0.25,1));break;}}});
+V6.hurt.push((p,dmg,fromPlayer)=>{if(fromPlayer&&time-VOX.last>2.5&&p.state!=='dead'&&Math.random()<0.5)speak(pick(BARK.hit),'МОМО',0.8);});
+/* iOS only lets speech start after a user gesture: prime it on the first tap */
+addEventListener('pointerdown',function prime(){if(VOX.ok){try{const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u);}catch(e){}voxVoices();}removeEventListener('pointerdown',prime);},{once:true});
 /*@@V6-END*/
 
 /* ======================= BOOT ======================= */

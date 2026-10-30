@@ -67,7 +67,7 @@ function paintEnd(apply){$('#paint').classList.remove('on');document.body.classL
   setTimeout(()=>{pop('+'+pay+' € РЕСПЕКТА','#7dff9a');banner(cov>0.35?'ШЕДЕВР!':cov>0.15?'КУСОК!':'ТЕГ!',PNT.colors.size+' цв. · '+Math.round(cov*100)+'% стены',2);},1300);
   if(typeof m2Tagged==='function'&&STORY.cur==='m2'&&STORY.stage==='tag')setTimeout(()=>m2Tagged(t),1400);
   if(STORY.onPiece)STORY.onPiece(t,cov);
-  addCrime(near?0.2:0.6);if(pl.spray<=0)setTimeout(()=>{equip('fists');showMsg('БАЛЛОНЧИКИ КОНЧИЛИСЬ',1.5);},1600);}
+  if(peds.some(p=>p.type==='cop'&&Math.hypot(p.x-pl.x,p.z-pl.z)<30))addCrime(0.8);if(pl.spray<=0)setTimeout(()=>{equip('fists');showMsg('БАЛЛОНЧИКИ КОНЧИЛИСЬ',1.5);},1600);}
 V6.upd.push(dt=>{const a=PNT.anim;if(!a)return;a.t+=dt;a.mat.opacity=Math.min(1,a.t/1.3);pl.ch.aim=1;
   if(Math.random()<dt*20){const w=PNT.wall;emit(w.x+w.nx*0.3+rr(-1.2,1.2)*w.nz,rr(1,2.3),w.z+w.nz*0.3-rr(-1.2,1.2)*w.nx,1,PNT.col,0.4,0.4,0.6,0);}
   if(Math.random()<dt*6)nz(0.3,4200,'highpass',0.12);

@@ -51,7 +51,7 @@ function playIntro(){const H=HOSP,P0={x:pl.x,z:pl.z};wanted=0;const vo=(l,d)=>({
     {dur:2.6,cam:trackShot(pl,[-0.6,1.6,-2.4],[0,1.6,0],42),acts:[['gest',pl,'look',2.4]],do:()=>{$('#sub').classList.remove('vo');}}],
     ()=>{pl.cineGo=null;$('#sub').classList.remove('vo');showMsg('Момо ждёт тебя у подъезда — жёлтая метка «M» на карте.',5);});}
 /* new games start with the intro instead of the old hint */
-{const sp=startPlay;startPlay=function(l){sp(l);if(!l&&!(pl.story&&pl.story.intro)){pl.story=pl.story||{};pl.story.intro=1;setTimeout(()=>{if(state==='play')playIntro();},600);}};}
+{const sp=startPlay;startPlay=function(l){sp(l);if(!l){gameMin=18*60+35;updDayNight(true);}if(!l&&!(pl.story&&pl.story.intro)){pl.story=pl.story||{};pl.story.intro=1;setTimeout(()=>{if(state==='play')playIntro();},600);}};}
 /* richer staging for chapters 1–2: replace their openings with moving actors */
 const _m1=startM1;startM1=function(){_m1();const momo=STORY.actors[0];if(!momo||!CUT.steps)return;const mp={x:momo.x,z:momo.z},P_={x:pl.x,z:pl.z};
   pl.z+=3.5;momo.x-=2.5;momo.ch.pose=null;
@@ -81,7 +81,7 @@ STORY.onPiece=(t,cov)=>{if(STORY.cur!=='m3'||STORY.stage!=='go')return;if(Math.h
   if(cov<0.12){setTimeout(()=>showMsg('Слишком мало краски. Надя просила КУСОК — нарисуй больше.',3),1500);return;}
   STORY.stage='escape';clearTarget();PNT.after=()=>{const w=STORY.spots.wall3;cutscene([
     {dur:3.2,cam:craneShot({x:w.x,z:w.z},5,-Math.PI/2,1.4,7,3.2,52)},
-    {dur:2.6,cam:{from:[w.x-12,1.2,w.z+16],to:[w.x-10,1.4,w.z+12],look:[w.x-4,1,w.z],fov:44},say:['','*сирены*'],do:()=>{addCrime(10);}}],
+    {dur:2.6,cam:{from:[w.x-12,1.2,w.z+16],to:[w.x-10,1.4,w.z+12],look:[w.x-4,1,w.z],fov:44},say:['','*сирены*'],do:()=>{addCrime(3.2);}}],
     ()=>{objective('<em>Уходи от полиции</em> и вернись домой');setTarget(HOME.x,HOME.z);});};};
 function m3Tick(){if(pl.dead){missionFailed('Тебя взяли. Кусок закрасят к утру.');return;}
   if(STORY.stage==='escape'&&Math.hypot(HOME.x-pl.x,HOME.z-pl.z)<4){if(wanted>0){if(!STORY.data.w){STORY.data.w=1;objective('Сначала <em>сбрось хвост</em>');}return;}if(!pl.inCar)m3Outro();}}

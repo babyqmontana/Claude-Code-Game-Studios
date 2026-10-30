@@ -98,3 +98,17 @@ Code for the new systems lives in `src/v6/*.js` and is inlined into `index.html`
   finale «Хищники» (take the rivals' lot, beat Стервятник). Cutscenes use orbit, crane, dolly, tracking and
   shoulder shots, chapter cards and film grain; actors walk, turn, point, shrug, dap, laugh and shake spray cans
   while they talk.
+
+## v8 — same game everywhere, fairer police, livelier people
+- **Why the published page could look different from the screenshots:** assets had a 25-second loading timeout,
+  after which the world was built with the old procedural people, cars and canvas textures — on a phone over mobile
+  data that happened. Loading now waits for everything (progress on the title screen) and only gives up after
+  3 minutes. New games also start at dusk (18:35) instead of at night.
+- **Balance:** the player takes half damage, heals slowly back to 50 when out of trouble, falls hurt only from real
+  heights; police and gangs shoot less often and less accurately, fewer cops per star, stars fade faster, painting
+  only draws heat when a cop is near.
+- **Alive:** characters blink; idle stance shifts weight and breathes, with fidgets (scratch the head, look around,
+  tug the hoodie, roll the neck); walking has more swagger.
+- **French voices:** cutscene and shop lines are spoken in French through the browser's speech synthesis (different
+  pitch per character, Russian subtitles stay), plus street barks — greetings from crews, threats when a fight
+  starts, police shouts, yelps when hit. Uses whatever French voice the device has; silent if there is none.
