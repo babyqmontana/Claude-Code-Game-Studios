@@ -96,8 +96,17 @@ def fetch_model(pid, name, target):
             vis = trimesh.visual.ColorVisuals(face_colors=np.tile((np.array(col[:3]) * 255 if col is not None else [150, 150, 150]).tolist() + [255], (len(f), 1)))
         out.add_geometry(trimesh.Trimesh(p, f, visual=vis, process=False), geom_name=f'{name}_{i}')
     data = out.export(file_type='glb')
-    open(os.path.join(OUT, 'models', name + '.glb'), 'wb').write(data)
-    return total, sum(len(g.faces) for g in out.geometry.values()), len(data)
+    return total, sum(len(g.faces) for g in out.geometry.values()), write_json_gltf(data, name)
+
+def write_json_gltf(glb_bytes, name):
+    """Artifact hosting serves .json but not .glb, so models ship as glTF JSON with embedded data URIs."""
+    from pygltflib import GLTF2, BufferFormat, ImageFormat
+    g = GLTF2.load_from_bytes(glb_bytes)
+    g.convert_images(ImageFormat.DATAURI)
+    g.convert_buffers(BufferFormat.DATAURI)
+    path = os.path.join(OUT, 'models', name + '.json')
+    g.save_json(path)
+    return os.path.getsize(path)
 
 if __name__ == '__main__':
     which = sys.argv[1] if len(sys.argv) > 1 else 'all'

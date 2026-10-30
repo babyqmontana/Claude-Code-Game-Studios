@@ -430,7 +430,7 @@ function prepModel(root){const parts=[];root.updateMatrixWorld(true);root.traver
 function loadAssets(){
   const imgP=TEXN.map(n=>new Promise(res=>{const im=new Image();im.onload=()=>{ASSETS.img[n]=im;res();};im.onerror=()=>res();im.src='assets/tex/'+n+'.jpg';}));
   const L=THREE.GLTFLoader?new THREE.GLTFLoader():null;
-  const mdlP=L?MDLN.map(n=>new Promise(res=>{try{L.load('assets/models/'+n+'.glb',g=>{try{ASSETS.mdl[n]=prepModel(g.scene);}catch(e){}res();},undefined,()=>res());}catch(e){res();}})):[];
+  const mdlP=L?MDLN.map(n=>new Promise(res=>{try{L.load('assets/models/'+n+'.json',g=>{try{ASSETS.mdl[n]=prepModel(g.scene);}catch(e){}res();},undefined,()=>res());}catch(e){res();}})):[];
   return Promise.race([Promise.all(imgP.concat(mdlP)),new Promise(r=>setTimeout(r,20000))]);}
 function modelGroup(n,s){const p=ASSETS.mdl[n];if(!p)return null;const G=new THREE.Group();p.forEach(q=>G.add(new THREE.Mesh(q.g,q.m)));if(s)G.scale.setScalar(s);return G;}
 function modelInstances(n,mats,sc){const p=ASSETS.mdl[n];if(!p||!mats.length)return;p.forEach(q=>{const im=new THREE.InstancedMesh(q.g,q.m,mats.length);mats.forEach((m,i)=>im.setMatrixAt(i,m));(sc||scene).add(im);});}
