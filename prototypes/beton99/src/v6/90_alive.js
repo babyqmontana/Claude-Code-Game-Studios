@@ -27,7 +27,7 @@ const VOX={fr:null,ok:'speechSynthesis' in window,last:0};
 function voxVoices(){if(!VOX.ok)return;const v=speechSynthesis.getVoices().filter(x=>/^fr/i.test(x.lang));VOX.fr=v.length?v:null;}
 if(VOX.ok){voxVoices();speechSynthesis.onvoiceschanged=voxVoices;}
 const VOICE={'МОМО':[0.8,1.06,0],'ДЖАМЕЛЬ':[0.9,1.0,1],'НАДЯ':[1.25,1.05,2],'СТЕРВЯТНИК':[0.55,0.9,3],'ПРОДАВЕЦ':[1.0,1.1,1],'':[0.85,0.95,0]};
-function speak(fr,who,vol){if(!VOX.ok||!VOX.fr||!fr||SET.sfx<=0)return;try{const u=new SpeechSynthesisUtterance(fr);const p=VOICE[who]||[0.95,1.05,0];
+function speak(fr,who,vol){if(!VOX.ok||!fr||SET.sfx<=0)return;if(!VOX.fr){try{const u=new SpeechSynthesisUtterance(fr);u.lang='fr-FR';const p=VOICE[who]||[0.95,1.05,0];u.pitch=p[0];u.rate=p[1];u.volume=clamp((vol??1)*SET.sfx/10,0,1);speechSynthesis.cancel();speechSynthesis.speak(u);VOX.last=time;}catch(e){}return;}try{const u=new SpeechSynthesisUtterance(fr);const p=VOICE[who]||[0.95,1.05,0];
     const pool=VOX.fr,fem=who==='НАДЯ',pickV=pool.find(v=>fem?/female|femme|amelie|aurelie|audrey|marie|julie|celine|hortense|virginie/i.test(v.name):/male|homme|thomas|daniel|nicolas|paul|henri|claude|antoine/i.test(v.name));
     u.voice=pickV||pool[p[2]%pool.length];u.lang=u.voice.lang;u.pitch=p[0];u.rate=p[1];u.volume=clamp((vol??1)*SET.sfx/10,0,1);speechSynthesis.cancel();speechSynthesis.speak(u);VOX.last=time;}catch(e){}}
 const FR={
