@@ -87,11 +87,11 @@ function shellGeo(src,app,part){const key=src.uuid+part+app.top+app.bottom+app.s
   const inTop=(px,py)=>px>=64&&py<215&&!(px>=96&&py>=162&&(sleeve==='tee'||sleeve==='tank'||sleeve==='jersey'))&&!(px>=96&&py>=108&&(sleeve==='tank'||sleeve==='jersey'));
   const inBot=(px,py)=>px<64&&py<128&&!(shortL&&(py%64)>30);
   const keep=[];for(let t=0;t<triN;t++){let cx=0,cy=0;for(let e=0;e<3;e++){const i=idx?idx[t*3+e]:t*3+e;cx+=U.getX(i)*128/3;cy+=U.getY(i)*256/3;}if(part==='top'?inTop(cx,cy):inBot(cx,cy))keep.push(t);}
-  const amt=part==='top'?({tee:0.038,teelong:0.034,jersey:0.024,hoodie:0.042,puffer:0.075,track:0.03,long:0.018,tank:0.012}[sleeve]||0.02):({baggy:0.042,jog:0.022,cargo:0.036,short:0.03,jorts:0.03}[app.bottom]||0.02);
+  const amt=part==='top'?({tee:0.038,teelong:0.034,jersey:0.024,hoodie:0.042,puffer:0.11,track:0.03,long:0.018,tank:0.012}[sleeve]||0.02):({baggy:0.06,jog:0.024,cargo:0.05,short:0.03,jorts:0.03}[app.bottom]||0.02);
   const geo=new THREE.BufferGeometry(),names=Object.keys(src.attributes),out={};names.forEach(n=>out[n]=[]);
   for(const t of keep)for(let e=0;e<3;e++){const i=idx?idx[t*3+e]:t*3+e;for(const n of names){const A=src.attributes[n];for(let c=0;c<A.itemSize;c++)out[n].push(A.array[i*A.itemSize+c]);}
     const v=sm.get(kq(i)),L=Math.hypot(v[0],v[1],v[2])||1,h=(P_.getY(i)-bb.min.y)/H;
-    let off=amt*H;if(part==='bot'){off*=1+1.4*clamp((0.5-h)/0.45,0,1);}else{off*=1+0.5*clamp((0.62-h)/0.1,0,1);}
+    let off=amt*H;if(part==='bot'){off*=1+1.9*clamp((0.5-h)/0.45,0,1);}else{off*=1+0.5*clamp((0.62-h)/0.1,0,1);}
     const pi=out.position.length-3;out.position[pi]+=v[0]/L*off;out.position[pi+1]+=v[1]/L*off*(part==='bot'?0.25:0.6);out.position[pi+2]+=v[2]/L*off;
     if(part==='bot'&&h<0.1){out.position[pi+1]=Math.max(out.position[pi+1],bb.min.y+H*0.045);}}
   for(const n of names){const A=src.attributes[n];geo.setAttribute(n,new THREE.BufferAttribute(new A.array.constructor(out[n]),A.itemSize,A.normalized));}
