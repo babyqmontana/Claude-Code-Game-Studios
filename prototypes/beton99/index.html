@@ -353,7 +353,8 @@ const rnd=(a,b)=>a+(b-a)*srand(), pick=a=>a[Math.floor(srand()*a.length)];
 const rr=(a,b)=>a+(b-a)*Math.random(), rpick=a=>a[Math.floor(Math.random()*a.length)];
 const store={get(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
 const SAVEKEY='beton99_save', SETKEY='beton99_settings_v5';
-const SET=Object.assign({style:'ps2',res:720,jitter:0,affine:0,dither:1,scan:0,bloom:1,sens:1,music:5,sfx:8},store.get(SETKEY)||{});
+const IS_PC=/Electron/.test(navigator.userAgent);
+const SET=Object.assign({style:'ps2',res:IS_PC?1080:720,jitter:0,affine:0,dither:1,scan:0,bloom:1,sens:1,music:5,sfx:8},store.get(SETKEY)||{});
 const inGame=()=>state==='play'||state==='interior'||state==='room';
 const isTouch=matchMedia('(pointer:coarse)').matches||('ontouchstart' in window);
 
@@ -1861,7 +1862,7 @@ function adjRow(el,d){const tbl=el.dataset.tbl==='o'?OPTS:CREATOR,r=tbl[+el.data
 const valHTML=(r,v)=>r.c?`<i class="sw" style="background:${v}"></i>`:r.n[r.o.indexOf(v)];
 function renderRows(box,tbl,src,tag){box.innerHTML='';tbl.forEach((r,i)=>{const el=document.createElement('div');el.className='mi row';el.dataset.row=i;el.dataset.tbl=tag;
   el.innerHTML=`<span class="rl">${r.l}</span><span class="rv"><b class="ar" data-dir="-1">◀</b><span class="val">${tag==='o'?(r.n?r.n[r.o.indexOf(src[r.k])]:src[r.k]):valHTML(r,src[r.k])}</span><b class="ar" data-dir="1">▶</b></span>`;box.appendChild(el);});}
-const OPTS=[{k:'style',l:'СТИЛЬ ГРАФИКИ',o:['ps2','ps1'],n:['PS2 · ГЛАДКО','PS1 · РЕТРО']},{k:'bloom',l:'СВЕЧЕНИЕ',o:[0,1],n:['ВЫКЛ','ВКЛ']},{k:'res',l:'РАЗРЕШЕНИЕ',o:[240,360,480,720,900],n:['240P','360P','480P','720P','900P']},{k:'jitter',l:'ДРОЖАНИЕ ПОЛИГОНОВ',o:[0,1],n:['ВЫКЛ','ВКЛ']},
+const OPTS=[{k:'style',l:'СТИЛЬ ГРАФИКИ',o:['ps2','ps1'],n:['PS2 · ГЛАДКО','PS1 · РЕТРО']},{k:'bloom',l:'СВЕЧЕНИЕ',o:[0,1],n:['ВЫКЛ','ВКЛ']},{k:'res',l:'РАЗРЕШЕНИЕ',o:[240,360,480,720,900,1080,1440],n:['240P','360P','480P','720P','900P','1080P','1440P']},{k:'jitter',l:'ДРОЖАНИЕ ПОЛИГОНОВ',o:[0,1],n:['ВЫКЛ','ВКЛ']},
   {k:'affine',l:'АФФИННЫЕ ТЕКСТУРЫ',o:[0,0.25,0.5,0.75,1],n:['0 %','25 %','50 %','75 %','100 %']},{k:'dither',l:'ДИЗЕРИНГ 15 БИТ',o:[0,1],n:['ВЫКЛ','ВКЛ']},
   {k:'scan',l:'ЛИНИИ ЭЛТ',o:[0,1],n:['ВЫКЛ','ВКЛ']},{k:'sens',l:'ЧУВСТВ. КАМЕРЫ',o:[0.5,0.75,1,1.25,1.5,2],n:['0.5','0.75','1','1.25','1.5','2']},
   {k:'music',l:'МУЗЫКА',o:[0,1,2,3,4,5,6,7,8,9,10]},{k:'sfx',l:'ЗВУКИ',o:[0,1,2,3,4,5,6,7,8,9,10]}];

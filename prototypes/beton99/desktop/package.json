@@ -1,0 +1,53 @@
+{
+  "name": "beton99",
+  "productName": "BETON 99",
+  "version": "0.10.0",
+  "description": "B\u00c9TON 99 \u2014 PS1/PS2-style open world prototype",
+  "main": "main.js",
+  "author": "BETON 99 prototype",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist:win": "electron-builder --win nsis --x64",
+    "dist:linux": "electron-builder --linux AppImage --x64"
+  },
+  "devDependencies": {
+    "electron": "31.7.7",
+    "electron-builder": "24.13.3"
+  },
+  "build": {
+    "appId": "fr.beton99.game",
+    "productName": "BETON 99",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "game/**/*"
+    ],
+    "asar": true,
+    "win": {
+      "target": "nsis",
+      "signAndEditExecutable": false,
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "BETON 99",
+      "artifactName": "BETON99-Setup-${version}.exe",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "runAfterFinish": true
+    },
+    "linux": {
+      "target": "AppImage",
+      "category": "Game",
+      "artifactName": "BETON99-${version}.AppImage",
+      "icon": "build/icon.png"
+    },
+    "publish": null
+  }
+}
