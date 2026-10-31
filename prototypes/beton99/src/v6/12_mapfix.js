@@ -3,7 +3,7 @@
    the bend and grow it (the bend stretches things by up to ~2x near a swirl). */
 {const S=new THREE.Sphere(),V=new V3();
   THREE.Frustum.prototype.intersectsObject=function(o){const g=o.geometry;if(!g)return true;if(g.boundingSphere===null)g.computeBoundingSphere();
-    S.copy(g.boundingSphere).applyMatrix4(o.matrixWorld);if(WARPU.value>0.5){warpV(S.center);S.radius=S.radius*2+3;}return this.intersectsSphere(S);};
+    S.copy(g.boundingSphere).applyMatrix4(o.matrixWorld);if(WARPU.value>0.5&&!o.userData.rigidObj){warpV(S.center);S.radius=S.radius*2+3;}return this.intersectsSphere(S);};
   THREE.Frustum.prototype.intersectsSprite=function(sp){S.center.set(0,0,0);S.radius=0.7071067811865476;S.applyMatrix4(sp.matrixWorld);if(WARPU.value>0.5){warpV(S.center);S.radius+=2;}return this.intersectsSphere(S);};}
 /* the map, drawn as vectors in the bent space (no pixel smearing) */
 function drawWarpedMap(){const N=1024,[c,g]=mk(N,N),k=N/MW,W=(x,z)=>{const w=warpRaw(x,z);return[(w[0]+MARG)*k,(w[1]+MARG)*k];};
@@ -23,7 +23,7 @@ function drawWarpedMap(){const N=1024,[c,g]=mk(N,N),k=N/MW,W=(x,z)=>{const w=war
   // buildings, with a light edge so shapes read
   colliders.forEach(cc=>{if(cc.h<2||cc.x1-cc.x0>100||cc.z1-cc.z0>100||(cc.x1-cc.x0)<0.9)return;poly(rect(cc.x0,cc.z0,cc.x1,cc.z1,2.5),'#7a729e','rgba(220,215,255,.35)',1);});
   // round plazas
-  for(const[[cx,cz]]of SWC){if(cx<=0||cz<=0||cx>=SIZE||cz>=SIZE)continue;const p=W(cx,cz);g.fillStyle='#4a6a3a';g.beginPath();g.arc(p[0],p[1],3.4*k,0,TAU);g.fill();g.strokeStyle='#e6e2f2';g.lineWidth=1.2;g.beginPath();g.arc(p[0],p[1],5.6*k,0,TAU);g.stroke();}
+  for(const[cx,cz]of PLAZAS){if(cx<=0||cz<=0||cx>=SIZE||cz>=SIZE)continue;const p=W(cx,cz);g.fillStyle='#4a6a3a';g.beginPath();g.arc(p[0],p[1],3.4*k,0,TAU);g.fill();g.strokeStyle='#e6e2f2';g.lineWidth=1.2;g.beginPath();g.arc(p[0],p[1],5.6*k,0,TAU);g.stroke();}
   // perimeter wall
   g.strokeStyle='#6a6680';g.lineWidth=2*k;g.beginPath();rect(-13,-13,SIZE+13,SIZE+13,6).forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.closePath();g.stroke();
   return c;}

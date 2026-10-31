@@ -1,16 +1,16 @@
 /* ======================= V6 CLOTHES SHOP (try on at the mirror, orbit camera) ======================= */
 const CLOTH=[
-  {cat:'ГОЛОВА',zoom:'head',items:[['БЕЗ ГОЛОВНОГО УБОРА',0,{hat:'none'}],['КЕПКА · ЧЁРНАЯ',15,{hat:'cap',hatCol:'#151515'}],['КЕПКА · БОРДО',15,{hat:'cap',hatCol:'#7a1020'}],['КЕПКА · БЕЛАЯ',18,{hat:'cap',hatCol:'#e8e8e8'}],
+  {cat:'ГОЛОВА',zoom:'head',items:[['БЕЗ ГОЛОВНОГО УБОРА',0,{hat:'none'}],['ФИТТЕД · НЕЙВИ',35,{hat:'fitted',hatCol:'#1b2a5a'}],['ФИТТЕД · ЧЁРНЫЙ',35,{hat:'fitted',hatCol:'#121212'}],['КЕПКА НАЗАД · БОРДО',25,{hat:'back',hatCol:'#8a1414'}],['ДЮРАГ · ЧЁРНЫЙ',12,{hat:'durag',hatCol:'#121212'}],['ДЮРАГ · ЗОЛОТО',14,{hat:'durag',hatCol:'#d8b13a'}],['КЕПКА · ЧЁРНАЯ',15,{hat:'cap',hatCol:'#151515'}],['КЕПКА · БОРДО',15,{hat:'cap',hatCol:'#7a1020'}],['КЕПКА · БЕЛАЯ',18,{hat:'cap',hatCol:'#e8e8e8'}],
     ['БИНИ · ЧЁРНАЯ',12,{hat:'bonnet',hatCol:'#1a1a1a'}],['БИНИ · ОРАНЖ',12,{hat:'bonnet',hatCol:'#e0701a'}],['БИНИ · ХАКИ',12,{hat:'bonnet',hatCol:'#4a5a2a'}],['КАПЮШОН',0,{hat:'hood'}],['МАСКА «ХАМСА»',40,{hat:'mask'}]]},
   {cat:'ВЕРХ',zoom:'body',items:[['ФУТБОЛКА · БЕЛАЯ «ЛОГО»',20,{top:'tee',topCol:'#f2f2f2',print:6}],['ФУТБОЛКА · ЧЁРНАЯ «93»',20,{top:'tee',topCol:'#151515',print:3}],['ФУТБОЛКА · КРАСНАЯ',20,{top:'tee',topCol:'#b5121b',print:1}],
-    ['ДВЕ ФУТБОЛКИ (С РУКАВОМ)',28,{top:'teelong',topCol:'#e8e8e8',longCol:'#151515',print:5}],['ХУДИ · СЕРОЕ',45,{top:'hoodie',topCol:'#8a8a90',print:0}],['ХУДИ · ЧЁРНОЕ',45,{top:'hoodie',topCol:'#141414',print:2}],
+    ['ДВЕ ФУТБОЛКИ (С РУКАВОМ)',28,{top:'teelong',topCol:'#e8e8e8',longCol:'#151515',print:5}],['БАСКЕТ. МАЙКА · КРАСНАЯ 23',55,{top:'jersey',topCol:'#8a1414',num:23}],['БАСКЕТ. МАЙКА · ЖЁЛТАЯ 8',55,{top:'jersey',topCol:'#d8b13a',num:8}],['ПУХОВИК · ЧЁРНЫЙ',120,{top:'puffer',topCol:'#121212'}],['ПУХОВИК · ЖЁЛТЫЙ',120,{top:'puffer',topCol:'#d8b13a'}],['ХУДИ · СЕРОЕ',45,{top:'hoodie',topCol:'#8a8a90',print:0}],['ХУДИ · ЧЁРНОЕ',45,{top:'hoodie',topCol:'#141414',print:2}],
     ['ХУДИ · НЕБЕСНОЕ',48,{top:'hoodie',topCol:'#5aa0d8',print:0}],['ОЛИМПИЙКА · ЧЁРНАЯ',60,{top:'track',topCol:'#151515',print:0}],['ОЛИМПИЙКА · ЗЕЛЁНАЯ',60,{top:'track',topCol:'#1e6a3a',print:0}],
     ['ЛОНГСЛИВ · ОЛИВА',30,{top:'long',topCol:'#55603a',print:0}],['МАЙКА · БЕЛАЯ',12,{top:'tank',topCol:'#efefef',print:0}]]},
   {cat:'НИЗ',zoom:'legs',items:[['БАГГИ · СИНИЕ',35,{bottom:'baggy',botCol:'#1b2a4a'}],['БАГГИ · ЧЁРНЫЕ',35,{bottom:'baggy',botCol:'#151515'}],['БАГГИ · СВЕТЛЫЕ',38,{bottom:'baggy',botCol:'#6a86b0'}],
-    ['ДЖОГГЕРЫ · СЕРЫЕ',30,{bottom:'jog',botCol:'#6a6a70'}],['ДЖОГГЕРЫ · ЧЁРНЫЕ',30,{bottom:'jog',botCol:'#121212'}],['ШОРТЫ · ХАКИ',18,{bottom:'short',botCol:'#6a6040'}],['ДЖИНСОВЫЕ ШОРТЫ',25,{bottom:'jorts',botCol:'#2a4a7a'}]]},
+    ['КАРГО · ХАКИ',40,{bottom:'cargo',botCol:'#6b5a3a'}],['КАРГО · ЧЁРНЫЕ',40,{bottom:'cargo',botCol:'#121212'}],['ДЖОГГЕРЫ · СЕРЫЕ',30,{bottom:'jog',botCol:'#6a6a70'}],['ДЖОГГЕРЫ · ЧЁРНЫЕ',30,{bottom:'jog',botCol:'#121212'}],['ШОРТЫ · ХАКИ',18,{bottom:'short',botCol:'#6a6040'}],['ДЖИНСОВЫЕ ШОРТЫ',25,{bottom:'jorts',botCol:'#2a4a7a'}]]},
   {cat:'ОБУВЬ',zoom:'feet',items:[['БЕГОВЫЕ · КРАСНЫЕ',40,{shoe:'#c41e1e',shoeType:'runner'}],['БЕГОВЫЕ · БЕЛЫЕ',45,{shoe:'#efefef',shoeType:'runner'}],['БЕГОВЫЕ · ЧЁРНЫЕ',40,{shoe:'#151515',shoeType:'runner'}],
-    ['ХАЙ-ТОПЫ · СИНИЕ',70,{shoe:'#1f4fbf',shoeType:'hitop'}],['ХАЙ-ТОПЫ · ЗОЛОТО',90,{shoe:'#c8a038',shoeType:'hitop'}],['СКЕЙТ-КЕДЫ',35,{shoe:'#2a2a2a',shoeType:'skate'}]]},
-  {cat:'ЦЕПЬ',zoom:'chest',items:[['БЕЗ ЦЕПИ',0,{chain:0}],['ЗОЛОТАЯ ЦЕПЬ',120,{chain:1}]]}];
+    ['ХАЙ-ТОПЫ · СИНИЕ',70,{shoe:'#1f4fbf',shoeType:'hitop'}],['ХАЙ-ТОПЫ · ЗОЛОТО',90,{shoe:'#c8a038',shoeType:'hitop'}],['БОТИНКИ · ПШЕНИЧНЫЕ',110,{shoe:'#d8a030',shoeType:'boot'}],['БОТИНКИ · ЧЁРНЫЕ',100,{shoe:'#1a1a1a',shoeType:'boot'}]]},
+  {cat:'ЦЕПЬ',zoom:'chest',items:[['БЕЗ ЦЕПИ',0,{chain:0}],['ЗОЛОТАЯ ЦЕПЬ',120,{chain:1}],['ЦЕПЬ С КУЛОНОМ',220,{chain:2}]]}];
 const DRESS={cat:0,i:0,app:null,orig:null,ang:0,rep:0,panel:null};
 (()=>{const css=document.createElement('style');css.textContent=`
 #cloth{position:fixed;left:max(14px,env(safe-area-inset-left));top:50%;transform:translateY(-50%);width:min(340px,46vw);z-index:6;display:none;font:600 13px 'Exo 2',sans-serif;color:#fff;

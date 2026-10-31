@@ -1,30 +1,28 @@
-/* ======================= V6 ROUND CITY: the grid is bent into arcs, rings and ovals at render time ======================= */
-/* Logic, AI and collisions stay on the grid. Every vertex, the camera and both maps go through the same field:
-   five swirls around crossroads (a swirl rotates points by an angle that fades with distance, so it can never fold
-   the city onto itself) followed by long gentle waves. Streets near a swirl centre curve into arcs around a round
-   plaza; blocks between swirls become wedges and ovals. */
+/* ======================= V6 CURVED CITY: the grid is bent into long, gentle curves at render time ======================= */
+/* Logic, AI and collisions stay on the grid. Static geometry, the maps and the camera go through one smooth field made of
+   long waves only: streets drift up to ~24 m in wide arcs while local stretch stays under ~10 % on average (the earlier
+   swirls stretched space by 2x and were removed). People, cars and props are NOT bent: they are moved rigidly to their
+   bent position and turned with the street (see 13_rigid.js), so they never deform. */
 const WARPU={value:1};
-const SWIRLS=[[2,2,1.05,82],[4,1,-0.9,74],[1,4,-0.95,78],[4,4,0.95,80],[6,3,-0.7,70],[0,1,0.6,60]];
-const WARP_GLSL='uniform float uWarpK;\nvec2 tw(vec2 p,vec2 c,float A,float R){vec2 d=p-c;float a=A*exp(-dot(d,d)/(R*R));float s=sin(a),co=cos(a);return c+vec2(d.x*co-d.y*s,d.x*s+d.y*co);}\n'+
-  'vec2 warpP(vec2 p){'+SWIRLS.map(([a,b,A,R])=>'p=tw(p,vec2('+(a*64).toFixed(1)+','+(b*64).toFixed(1)+'),'+A.toFixed(3)+','+R.toFixed(1)+');').join('')+
-  'return p+vec2(8.0*sin(p.y*0.021+0.7)+4.0*sin((p.x+p.y)*0.013+2.1),8.0*sin(p.x*0.019+1.3)+4.0*sin((p.x-p.y)*0.015+0.4));}\n';
-function twJS(x,z,c,A,R,inv){const dx=x-c[0],dz=z-c[1],a=(inv?-1:1)*A*Math.exp(-(dx*dx+dz*dz)/(R*R)),s=Math.sin(a),co=Math.cos(a);return[c[0]+dx*co-dz*s,c[1]+dx*s+dz*co];}
-const SWC=SWIRLS.map(([a,b,A,R])=>[[a*P,b*P],A,R]);
-function wavesJS(x,z){return[8*Math.sin(z*0.021+0.7)+4*Math.sin((x+z)*0.013+2.1),8*Math.sin(x*0.019+1.3)+4*Math.sin((x-z)*0.015+0.4)];}
-function warpRaw(x,z){let p=[x,z];for(const[c,A,R]of SWC)p=twJS(p[0],p[1],c,A,R,false);const w=wavesJS(p[0],p[1]);return[p[0]+w[0],p[1]+w[1]];}
-/* inverse: undo the waves by fixed-point iteration, then unwind the swirls exactly in reverse order */
-function unwarpRaw(x,z){let q=[x,z];for(let i=0;i<6;i++){const w=wavesJS(q[0],q[1]);q=[x-w[0],z-w[1]];}for(let i=SWC.length-1;i>=0;i--){const[c,A,R]=SWC[i];q=twJS(q[0],q[1],c,A,R,true);}return q;}
+const WV=[18,0.0055,3,0.012];
+const WARP_GLSL='uniform float uWarpK;\nvec2 warpP(vec2 p){return p+vec2('+WV[0].toFixed(1)+'*sin(p.y*'+WV[1]+'+0.7)+'+WV[2].toFixed(1)+'*sin((p.x+p.y)*'+WV[3]+'+2.1),'+WV[0].toFixed(1)+'*sin(p.x*'+(WV[1]*0.92).toFixed(5)+'+1.3)+'+WV[2].toFixed(1)+'*sin((p.x-p.y)*'+(WV[3]*1.1).toFixed(5)+'+0.4));}\n';
+const SWC=[];const PLAZAS=[[2,2],[4,4],[4,1],[1,4],[5,3]].map(([a,b])=>[a*64,b*64]);
+function wavesJS(x,z){return[WV[0]*Math.sin(z*WV[1]+0.7)+WV[2]*Math.sin((x+z)*WV[3]+2.1),WV[0]*Math.sin(x*WV[1]*0.92+1.3)+WV[2]*Math.sin((x-z)*WV[3]*1.1+0.4)];}
+function warpRaw(x,z){const w=wavesJS(x,z);return[x+w[0],z+w[1]];}
+function unwarpRaw(x,z){let q=[x,z];for(let i=0;i<8;i++){const w=wavesJS(q[0],q[1]);q=[x-w[0],z-w[1]];}return q;}
 function warpXZ(x,z){if(WARPU.value<0.5)return[x,z];return warpRaw(x,z);}
 function warpV(v){const w=warpXZ(v.x,v.z);v.x=w[0];v.z=w[1];return v;}
+/* how much the street is turned at a point (radians, added to headings) */
+function warpRot(x,z){const a=warpRaw(x,z),b=warpRaw(x,z+0.5);return Math.atan2(b[0]-a[0],b[1]-a[1]);}
 /* heading as it looks on screen at a point */
 function visAng(x,z,a){const w0=warpRaw(x,z),w1=warpRaw(x+Math.sin(a)*0.6,z+Math.cos(a)*0.6);return Math.atan2(w1[0]-w0[0],w1[1]-w0[1]);}
 const WARP_LINE='wpos.xz=mix(wpos.xz,warpP(wpos.xz),uWarpK);';
-function addWarp(sh){sh.uniforms.uWarpK=WARPU;
+function addWarp(sh,mat){sh.uniforms.uWarpK=WARPU;if(mat&&mat.userData&&mat.userData.rigid)return;
   if(sh.vertexShader.includes('#include <project_vertex>')){sh.vertexShader=WARP_GLSL+sh.vertexShader.replace('#include <project_vertex>',
     'vec4 wpos=vec4(transformed,1.0);\n#ifdef USE_INSTANCING\nwpos=instanceMatrix*wpos;\n#endif\nwpos=modelMatrix*wpos;\n'+WARP_LINE+'\nvec4 mvPosition=viewMatrix*wpos;\ngl_Position=projectionMatrix*mvPosition;');}
   else if(sh.vertexShader.includes('vec4 mvPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );')){sh.vertexShader=WARP_GLSL+sh.vertexShader.replace('vec4 mvPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );',
     'vec4 wc=modelMatrix*vec4(0.0,0.0,0.0,1.0);wc.xz=mix(wc.xz,warpP(wc.xz),uWarpK);vec4 mvPosition=viewMatrix*wc;');}}
-THREE.Material.prototype.onBeforeCompile=function(sh){addWarp(sh);};
+THREE.Material.prototype.onBeforeCompile=function(sh){addWarp(sh,this);};
 /* the city must be finely tessellated to bend smoothly: subdivide long flat geometry before it reaches the GPU */
 function tessellate(geo,maxLen){if(!geo.isBufferGeometry)return geo;let g=geo.index?geo.toNonIndexed():geo;
   for(let pass=0;pass<6;pass++){const P_=g.attributes.position,n=P_.count;let need=false;for(let i=0;i<n;i+=3){for(let e=0;e<3;e++){const a=i+e,b=i+(e+1)%3;if(Math.hypot(P_.getX(a)-P_.getX(b),P_.getZ(a)-P_.getZ(b))>maxLen){need=true;break;}}if(need)break;}

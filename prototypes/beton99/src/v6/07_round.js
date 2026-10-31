@@ -2,7 +2,7 @@
 V6.build.push(()=>{
   // circular plazas on the swirl centres: cobbled island, white ring, give-way arrows painted on the asphalt
   const pav=LM({map:imgTex(ASSETS.img.pavers,3,3),color:0xc8c0b8,polygonOffset:true,polygonOffsetFactor:-2}),white=new THREE.MeshBasicMaterial({color:0xdedad2,polygonOffset:true,polygonOffsetFactor:-3});
-  for(const[[cx,cz]]of SWC){if(cx<=0||cz<=0||cx>=SIZE||cz>=SIZE)continue;
+  for(const[cx,cz]of PLAZAS){if(cx<=0||cz<=0||cx>=SIZE||cz>=SIZE)continue;
     const isl=new THREE.Mesh(new THREE.CircleGeometry(3.4,40).rotateX(-Math.PI/2),pav);isl.position.set(cx,0.03,cz);scene.add(isl);
     const kerb=new THREE.Mesh(new THREE.RingGeometry(3.4,3.65,40).rotateX(-Math.PI/2),LM({color:0xb0aca4}));kerb.position.set(cx,0.035,cz);scene.add(kerb);
     for(let k=0;k<28;k++){const a=k/28*TAU;const d=new THREE.Mesh(new THREE.PlaneGeometry(0.18,0.9).rotateX(-Math.PI/2).rotateY(-a),white);d.position.set(cx+Math.sin(a)*5.6,0.02,cz+Math.cos(a)*5.6);scene.add(d);}

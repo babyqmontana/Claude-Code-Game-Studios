@@ -12,9 +12,9 @@ const DETAIL=(()=>{const[c,g]=mk(256,256);const id=g.createImageData(256,256),d=
   for(let i=0;i<260;i++){g.fillStyle=R()<0.5?'rgba(0,0,0,.18)':'rgba(255,255,255,.14)';g.fillRect(R()*256,R()*256,1+R()*2,1);}
   const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.generateMipmaps=true;t.minFilter=THREE.LinearMipmapLinearFilter;t.anisotropy=MAXANI;return{value:t};})();
 function detailize(m,scale,amt){if(!m||m.userData.detail)return;m.userData.detail=1;const prev=m.onBeforeCompile;
-  m.onBeforeCompile=function(sh,r){prev.call(this,sh,r);sh.uniforms.tDetail=DETAIL;
+  m.onBeforeCompile=function(sh,r){prev.call(this,sh,r);if(this.userData.rigid)return;sh.uniforms.tDetail=DETAIL;
     sh.vertexShader='varying vec3 vDWP;varying vec3 vDWN;\n'+sh.vertexShader.replace(WARP_LINE,'vDWP=wpos.xyz;{vec3 wn=objectNormal;\n#ifdef USE_INSTANCING\nwn=mat3(instanceMatrix)*wn;\n#endif\nvDWN=normalize(mat3(modelMatrix)*wn);}\n'+WARP_LINE);
     sh.fragmentShader='uniform sampler2D tDetail;varying vec3 vDWP;varying vec3 vDWN;\n'+sh.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>\n{vec3 an=abs(vDWN);vec2 du=an.y>max(an.x,an.z)?vDWP.xz:(an.x>an.z?vDWP.zy:vDWP.xy);float dd=texture2D(tDetail,du*'+scale.toFixed(3)+').r*0.7+texture2D(tDetail,du*'+(scale*0.17).toFixed(3)+').r*0.3;diffuseColor.rgb*=1.0+(dd-0.5)*'+amt.toFixed(2)+';}');};
-  m.customProgramCacheKey=()=>'det'+scale+'_'+amt;m.needsUpdate=true;}
+  m.customProgramCacheKey=function(){return (this.userData.rigid?'rigid':'')+'det'+scale+'_'+amt;};m.needsUpdate=true;}
 function detailScene(root,scale,amt,skip){root.traverse(o=>{if(!o.isMesh||o.isSkinnedMesh||!o.material)return;if(skip&&skip(o))return;for(const m of Array.isArray(o.material)?o.material:[o.material])if(m.isMeshLambertMaterial&&!m.transparent)detailize(m,scale,amt);});}
 V6.build.push(()=>{sharpen(scene);detailScene(scene,0.9,0.55);});

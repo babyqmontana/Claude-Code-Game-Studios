@@ -130,3 +130,21 @@ Code for the new systems lives in `src/v6/*.js` and is inlined into `index.html`
 - The map is drawn as vector curves in the bent space (1024 px) instead of resampling a pixel image.
 - A real loading screen (progress bar, tips) stays up until the city is built; the menu never shows the fallback
   boxy character, and the menu flyover is bent like the game.
+
+## v10 — one file, no stretching, streetwear
+- **Published build is one self-contained file.** `python3 tools/build.py && python3 tools/bundle.py` writes
+  `dist/index.html` with three.js, the glTF loaders (`vendor/`) and every model and texture inlined. If a CDN or a
+  relative asset request failed in the artifact viewer, the game used to fall back to boxy placeholder people; now
+  it has nothing to fetch. Tested with all network requests blocked: every ped and car is a real model.
+- **No more stretching when the camera turns.** The swirls in the bend field stretched space 2.2x on average (up to
+  6x); they are gone. The field is now long waves only (streets drift up to ~24 m in wide arcs, average local
+  stretch ~9 %). People, cars, pickups, rats and balls are not bent at all: each frame they are moved rigidly to
+  their bent position and turned with the street (`src/v6/13_rigid.js`), and the camera is placed rigidly around the
+  bent target. Measured over full camera turns at four spots: distance, screen position and on-screen height of the
+  player stay constant.
+- **Streetwear people (`src/v6/95_street.js`).** Faces repainted: wider nose, full lips, thick brows, brown eyes;
+  hair painted or modelled — fade, cornrows, waves, dreads, afro, braids, bald; stubble, goatee or a boxed beard.
+  Clothes get a baggy shell (a copy of the cloth parts of the body pushed out along smoothed normals, on the same
+  skeleton): oversized tees and hoodies, baggy jeans, cargos, basketball jersey with a number, quilted puffer;
+  fitted caps (forward or back), durag with a tail, wheat boots, a thin gold chain with an optional medallion.
+  Skin tones and street peds lean darker; the clothes shop sells the new pieces.

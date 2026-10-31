@@ -64,7 +64,10 @@ V6.cam=function(){const rd=RDT||0.016,c=pl.inCar;updSlow(rd);
   const follow=c?1-Math.exp(-rd*14):1-Math.exp(-rd*30);CAMS.pos.x=lerp(CAMS.pos.x,cx,follow);CAMS.pos.y=lerp(CAMS.pos.y,cy,follow);CAMS.pos.z=lerp(CAMS.pos.z,cz,follow);
   cam.position.copy(CAMS.pos);
   if(shake>0.001){cam.position.x+=rr(-1,1)*shake*0.3;cam.position.y+=rr(-1,1)*shake*0.3;cam.position.z+=rr(-1,1)*shake*0.3;shake*=Math.pow(0.02,rd);}
-  warpV(cam.position);const lk=c?0.4:0.15+0.05*ak;cam.lookAt(warpV(new V3(tx+Math.sin(yw)*(ak*6+0.01),ty+lk-Math.sin(CAMS.kick)*2,tz+Math.cos(yw)*(ak*6+0.01))));
+  // place the camera rigidly around the bent target: the offset is rotated with the street, never stretched
+  {const W=warpRaw(tx,tz),r=WARPU.value>0.5?warpRot(tx,tz):0,co=Math.cos(r),si=Math.sin(r),rig=(x,z)=>{const dx=x-tx,dz=z-tz;return[W[0]+dx*co+dz*si,W[1]-dx*si+dz*co];};
+   const cp2=rig(cam.position.x,cam.position.z);cam.position.x=cp2[0];cam.position.z=cp2[1];const lk=c?0.4:0.15+0.05*ak,L=rig(tx+Math.sin(yw)*(ak*6+0.01),tz+Math.cos(yw)*(ak*6+0.01));
+   cam.lookAt(L[0],ty+lk-Math.sin(CAMS.kick)*2,L[1]);}
   CAMS.kick*=Math.pow(0.0005,rd);CAMS.kickX*=Math.pow(0.001,rd);CAMS.fovP*=Math.pow(0.002,rd);
   setFov(fov-CAMS.fovP,rd);
   $('#xh').style.opacity=ak>0.6?1:0;
